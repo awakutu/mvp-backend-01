@@ -1,5 +1,3 @@
-# MVP-Backend-01
-
 # MVP-Frontend-01
 
 # Cara Melakukan Kolaborasi Kode Sumber Terbuka
@@ -51,7 +49,7 @@ git checkout -b halaman-registrasi
 Lakukan perubahan di dalam  dan jangan lupa memberikan pesan yang jelas di commit.
 
 
-## 5. Dorong perubahan ke GitHub
+## 5. Dorong perubahan ke GitLab
 
 Dorong perubahan menggunakan perintah `git push`:
 ```
