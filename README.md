@@ -2,7 +2,7 @@
 
 # Cara Melakukan Kolaborasi Kode Sumber Terbuka
  
-Disarankan telah belum memiliki git, [ install segera ]( https://git-scm.com/downloads ).
+Disarankan telah memiliki git, apabila belum [ install segera ]( https://git-scm.com/downloads ).
 
 ## 1. Fork repositori ini
 
