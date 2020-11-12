@@ -8,14 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type Account struct {
-	ID        int    `gorm:"primary_key";auto_increment;not_null json:"-"`
-	IdAccount string `json:"id_account,omitempty"`
-	Username  string `json:"Username"`
-	Password  string `json:"password,omitempty"`
-	//AccountNumber int    `json:"account_number,omitempty"`
-	Email string `json:"email,omitempty"`
-	Phone string `json:"phone"`
+type User struct {
+	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username string `json:"Username"`
+	Password string `json:"password,omitempty"`
+	Nama     string `json:"name,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Phone    string `json:"phone,omitempty"`
+	Ttl      string `json:"ttl,omitempty"`
+	Foto     string `json:"foto,omitempty"`
 }
 
 type Auth struct {
@@ -23,9 +24,14 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
+type Kategori struct {
+	ID            string `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Nama_kategori string `json:"jenis_kategori"`
+}
+
 func Login(auth Auth) (bool, error, string) {
-	var account Account
-	if err := DB.Where(&Account{Username: auth.Username}).First(&account).Error; err != nil {
+	var account User
+	if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return false, errors.Errorf("Account not found"), ""
 		}
@@ -49,10 +55,8 @@ func Login(auth Auth) (bool, error, string) {
 	}
 }
 
-func InsertNewAccount(account Account) (bool, error) {
-	//account.AccountNumber = utils.RangeIn(111111, 999999)
-	//account.Saldo = 0
-	//account.IdAccount = fmt.Sprintf("id-%d", utils.RangeIn(111, 999))
+func InsertNewAccount(account User) (bool, error) {
+
 	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}

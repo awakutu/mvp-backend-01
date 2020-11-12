@@ -11,7 +11,7 @@ import (
 
 func CreateAccount(c *gin.Context) {
 
-	var account model.Account
+	var account model.User
 	if err := c.Bind(&account); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
