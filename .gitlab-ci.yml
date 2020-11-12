@@ -9,6 +9,6 @@ production:
     script:
         #- go mod vendor # tidak usah kalo folder vendor ikut dicommit
         - go build -o main.exe main.go 
-        - scp main.exe ubuntu@$DEPLOY_SERVER:/home/ubuntu/
+        - scp main.exe ubuntu@$DEPLOY_SERVER:/home/ubuntu/cocreate
     environment:
         name: production
