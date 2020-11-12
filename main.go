@@ -11,7 +11,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
-	router.POST("/register", controller.CreateAccount) //tanpa auth
+	router.POST("/api/register", controller.CreateAccount) //tanpa auth
 	//router.POST("/guest/login", controller.Login)
 
 	router.Run(":8084")
