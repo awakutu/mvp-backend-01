@@ -14,5 +14,5 @@ func main() {
 	router.POST("/api/register", controller.CreateAccount) //tanpa auth
 	router.POST("/api/login", controller.Login)
 
-	router.Run(":8080")
+	router.Run(":8084")
 }
