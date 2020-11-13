@@ -48,3 +48,16 @@ func Login(c *gin.Context) {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 	}
 }
+
+func GetKategori(c *gin.Context) {
+	var ka []model.Kategori
+	if err := c.Bind(&ka); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	//log.Println("LOGIN")
+	res := model.GetKateogi(ka)
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": res,
+	}, http.StatusOK, "success")
+}

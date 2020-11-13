@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	"CoCreate/app/utils"
 
 	"github.com/dgrijalva/jwt-go"
@@ -25,7 +27,7 @@ type Auth struct {
 }
 
 type Kategori struct {
-	ID            string `gorm:"primary_key";auto_increment;not_null json:"-"`
+	ID            int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Nama_kategori string `json:"jenis_kategori"`
 }
 
@@ -61,4 +63,15 @@ func InsertNewAccount(account User) (bool, error) {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
 	return true, nil
+}
+
+func GetKateogi(kat []Kategori) []Kategori {
+
+	//res := map[string]interface{}{}
+	DB.Find(&kat)
+
+	//res[`kategori`] = kat
+
+	fmt.Println(kat)
+	return kat
 }
