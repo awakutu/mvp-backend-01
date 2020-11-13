@@ -12,7 +12,7 @@ func main() {
 	router.Use(cors.Default())
 
 	router.POST("/api/register", controller.CreateAccount) //tanpa auth
-	//router.POST("/guest/login", controller.Login)
+	router.POST("/api/login", controller.Login)
 
-	router.Run(":8084")
+	router.Run(":80")
 }
