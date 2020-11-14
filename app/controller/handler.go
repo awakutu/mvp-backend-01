@@ -208,6 +208,16 @@ func UpdateProfil(c *gin.Context) {
 
 	fmt.Println(sk1.ID)
 
+	//sk1.ID
+
+	pass, err := utils.HashGenerator(usk.Password)
+	if err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	usk.Password = pass
+
 	result := model.DB.Model(model.User{}).Where("id = ?", sk1.ID).Updates(usk)
 
 	b := result.RowsAffected
