@@ -157,9 +157,9 @@ func VerifikasiSent(c *gin.Context) {
 
 	q := model.DB.Where("email=?", uID).Find(&v)
 	fmt.Println(q, &uID, v.Email)
-	if v.Email == "" {
+	/*if &uID == "" {
 		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "Tidak ada email tersebut"})
-	}
+	}*/
 
 	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("status", true)
 	if err1 != nil {
