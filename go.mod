@@ -9,6 +9,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/pkg/errors v0.9.1
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/gorm v1.20.6
 )

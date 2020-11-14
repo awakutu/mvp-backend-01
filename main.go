@@ -14,6 +14,11 @@ func main() {
 
 	router.POST("/api/register", controller.CreateAccount) //tanpa auth
 	router.POST("/api/login", controller.Login)
+
+	router.POST("/api/verifikasi", controller.Verifikasi)
+
+	router.GET("/api/verifikasi/:email", controller.VerifikasiSent)
+
 	/*
 		curl localhost:8084/api/login -H 'content-type:application/json' -d '{"username": "farhani", "password":"farhan"}'
 	*/
