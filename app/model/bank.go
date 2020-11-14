@@ -31,6 +31,12 @@ type Kategori struct {
 	Nama_kategori string `json:"jenis_kategori"`
 }
 
+type Detail_category struct {
+	IDU           int    `json:"id_user"`
+	IDK           int    `json:"id_kategori"`
+	Nama_kategori string `json:"jenis_kategori"`
+}
+
 func Login(auth Auth) (bool, error, string) {
 	var account User
 	if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
@@ -67,11 +73,23 @@ func InsertNewAccount(account User) (bool, error) {
 
 func GetKateogi(kat []Kategori) []Kategori {
 
+	//var account User
 	//res := map[string]interface{}{}
 	DB.Find(&kat)
-
-	//res[`kategori`] = kat
+	/*if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, errors.Errorf("Account not found"), ""
+		}
+	}*/
 
 	fmt.Println(kat)
 	return kat
+}
+
+func UserIKat(UIK Detail_category) (bool, error) {
+
+	if err := DB.Create(&UIK).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
 }

@@ -14,10 +14,17 @@ func main() {
 
 	router.POST("/api/register", controller.CreateAccount) //tanpa auth
 	router.POST("/api/login", controller.Login)
+	/*
+		curl localhost:8084/api/login -H 'content-type:application/json' -d '{"username": "farhani", "password":"farhan"}'
+	*/
+	router.GET("/api/pref/:id", middleware.Auth, controller.GetKategori)
+	/*
+		curl localhost:8084/api/pref/farhani -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU'
+	*/
 
-	router.GET("/api/pref", middleware.Auth, controller.GetKategori)
+	router.POST("/api/prefInsert", middleware.Auth, controller.CreateUserKag)
 
-	//server.AssignHandler("/api/pref", controller.GetK)
+	//curl localhost:8084/api/prefInsert -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' -H 'content-type:application/json' -d '{"id_user":1,"id_kategori":1, "jenis_kategori":"Keuangan"}'
 
 	router.Run(":8084")
 }
