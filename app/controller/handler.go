@@ -179,7 +179,7 @@ func GetProfil(c *gin.Context) {
 	//	return
 	//}
 	//log.Println("LOGIN")
-	uID := c.Param("id")
+	uID := c.Param("username")
 
 	q := model.DB.Where("username=?", uID).Find(&u)
 	fmt.Println(q, &uID, u.ID)
@@ -201,6 +201,7 @@ func UpdateProfil(c *gin.Context) {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	sk := c.Param("username")
 
 	var sk1 model.User
@@ -226,5 +227,4 @@ func UpdateProfil(c *gin.Context) {
 		"Data":        &usk,
 		"Rows_update": b,
 	}, http.StatusOK, "success")
-
 }
