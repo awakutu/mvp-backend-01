@@ -83,7 +83,7 @@ func GetKategori(c *gin.Context) {
 }
 
 func CreateUserKag(c *gin.Context) {
-	var usk model.Detail_category
+	var usk []model.Detail_category
 	//usk.IDU := c.Param("id")
 
 	if err := c.Bind(&usk); err != nil {
@@ -174,23 +174,23 @@ func VerifikasiSent(c *gin.Context) {
 func GetProfil(c *gin.Context) {
 	//var ka []model.Kategori
 	var u model.User
-	if err := c.Bind(&u); err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}
+	//if err := c.Bind(&u); err != nil {
+	//	utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+	//	return
+	//}
 	//log.Println("LOGIN")
-	uID := c.Param("username")
+	uID := c.Param("id")
 
 	q := model.DB.Where("username=?", uID).Find(&u)
 	fmt.Println(q, &uID, u.ID)
-	if u.Username == "" {
-		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "tidak ditemukan"})
-	}
+	//if u.Username == "" {
+	//	c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "tidak ditemukan"})
+	//	}
 
-	res := model.DB.Find(&u)
+	model.DB.Find(&u)
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		"Data": res,
+		"Data": u,
 	}, http.StatusOK, "success")
 }
 
@@ -201,7 +201,20 @@ func UpdateProfil(c *gin.Context) {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
-	sk := c.Param("id")
+	sk := c.Param("username")
 
-	model.DB.Table("users").Select("id = ?", sk).Updates(&usk)
+	var sk1 model.User
+	model.DB.Where("username=?", sk).Find(&sk1)
+
+	fmt.Println(sk1.ID)
+
+	result := model.DB.Model(model.User{}).Where("id = ?", sk1.ID).Updates(usk)
+
+	b := result.RowsAffected
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":        &usk,
+		"Rows_update": b,
+	}, http.StatusOK, "success")
+
 }
