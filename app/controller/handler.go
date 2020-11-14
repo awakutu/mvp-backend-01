@@ -13,7 +13,8 @@ import (
 )
 
 type Verif struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
+	Username string `json:"Username"`
 }
 
 func CreateAccount(c *gin.Context) {
@@ -108,7 +109,7 @@ const CONFIG_SENDER_NAME = "CoCreate <mvpkelompok1@gmail.com>"
 const CONFIG_AUTH_EMAIL = "mvpkelompok1@gmail.com"
 const CONFIG_AUTH_PASSWORD = "14112020mvp"
 
-func verif(c *gin.Context) {
+func Verifikasi(c *gin.Context) {
 
 	var v Verif
 	if err := c.Bind(&v); err != nil {
@@ -121,7 +122,7 @@ func verif(c *gin.Context) {
 	mailer.SetHeader("To", v.Email)
 	//mailer.SetAddressHeader("Cc", "tralalala@gmail.com", "Tra Lala La")
 	mailer.SetHeader("Subject", "Test mail")
-	mailer.SetBody("text/html", "Verifikasi email")
+	mailer.SetBody("text/html", "Verifikasi email : http://13.250.111.2:8084/api/verifikasi/"+v.Email)
 	//mailer.Attach("./sample.png")
 
 	dialer := gomail.NewDialer(
@@ -133,13 +134,6 @@ func verif(c *gin.Context) {
 
 	//flag, err := model.UserIKat(usk)
 	err := dialer.DialAndSend(mailer)
-	/*if flag {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
-		return
-	} else {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}*/
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -148,4 +142,31 @@ func verif(c *gin.Context) {
 		log.Println("Mail sent!")
 	}
 
+}
+
+func VerifikasiSent(c *gin.Context) {
+
+	var v Verif
+	var u model.User
+	if err := c.Bind(&v); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	uID := c.Param("email")
+
+	q := model.DB.Where("email=?", uID).Find(&v)
+	fmt.Println(q, &uID, v.Email)
+	if v.Email == "" {
+		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "Tidak ada email tersebut"})
+	}
+
+	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("status", true)
+	if err1 != nil {
+		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		return
+	} else {
+		utils.WrapAPIError(c, "err1.Error()", http.StatusBadRequest)
+		return
+	}
 }

@@ -19,6 +19,7 @@ type User struct {
 	Phone    string `json:"phone,omitempty"`
 	Ttl      string `json:"ttl,omitempty"`
 	Foto     string `json:"foto,omitempty"`
+	Status   bool
 }
 
 type Auth struct {
