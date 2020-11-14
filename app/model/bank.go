@@ -94,3 +94,12 @@ func UserIKat(UIK Detail_category) (bool, error) {
 	}
 	return true, nil
 }
+
+/*
+func Uprof(up User) (bool, error) {
+
+	//if err := DB.Where(i).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}*/

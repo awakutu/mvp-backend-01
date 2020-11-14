@@ -31,5 +31,9 @@ func main() {
 
 	//curl localhost:8084/api/prefInsert -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' -H 'content-type:application/json' -d '{"id_user":1,"id_kategori":1, "jenis_kategori":"Keuangan"}'
 
+	router.GET("/api/profil/:id", middleware.Auth, controller.GetProfil)
+
+	router.POST("/api/profil/update", middleware.Auth, controller.GetProfil)
+
 	router.Run(":8084")
 }

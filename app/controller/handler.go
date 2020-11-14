@@ -170,3 +170,38 @@ func VerifikasiSent(c *gin.Context) {
 		return
 	}
 }
+
+func GetProfil(c *gin.Context) {
+	//var ka []model.Kategori
+	var u model.User
+	if err := c.Bind(&u); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	//log.Println("LOGIN")
+	uID := c.Param("username")
+
+	q := model.DB.Where("username=?", uID).Find(&u)
+	fmt.Println(q, &uID, u.ID)
+	if u.Username == "" {
+		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "tidak ditemukan"})
+	}
+
+	res := model.DB.Find(&u)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": res,
+	}, http.StatusOK, "success")
+}
+
+func UpdateProfil(c *gin.Context) {
+	var usk model.User
+
+	if err := c.Bind(&usk); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	sk := c.Param("id")
+
+	model.DB.Table("users").Select("id = ?", sk).Updates(&usk)
+}
