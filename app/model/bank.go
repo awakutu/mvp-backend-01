@@ -19,7 +19,7 @@ type User struct {
 	Phone    string `json:"phone"`
 	Ttl      string `json:"ttl"`
 	Foto     []byte `json:"foto"`
-	Status   bool
+	Status   bool   `json:status`
 }
 
 type Auth struct {

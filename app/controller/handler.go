@@ -294,16 +294,10 @@ func AccepAdmin(c *gin.Context) {
 		return
 	}
 
-	pass, err := utils.HashGenerator(account.Password)
-	if err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}
+	//i := len(account)
+	//for i
 
-	fmt.Println(account.Username)
-	account.Password = pass
-
-	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Updates(account)
+	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Update("status", account.Status)
 	b := q.RowsAffected
 
 	fmt.Println(q, account)
