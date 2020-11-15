@@ -18,7 +18,7 @@ type User struct {
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	Ttl      string `json:"ttl"`
-	Foto     string `json:"foto"`
+	Foto     []byte `json:"foto"`
 	Status   bool
 }
 
@@ -36,6 +36,12 @@ type Detail_category struct {
 	IDU           int    `json:"id_user"`
 	IDK           int    `json:"id_kategori"`
 	Nama_kategori string `json:"jenis_kategori"`
+}
+
+type Admin struct {
+	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func Login(auth Auth) (bool, error, string) {
@@ -72,6 +78,7 @@ func InsertNewAccount(account User) (bool, error) {
 	return true, nil
 }
 
+//get list kategori
 func GetKateogi(kat []Kategori) []Kategori {
 
 	//var account User
@@ -87,6 +94,7 @@ func GetKateogi(kat []Kategori) []Kategori {
 	return kat
 }
 
+//insert kategori from user
 func UserIKat(UIK []Detail_category) (bool, error) {
 
 	if err := DB.Create(&UIK).Error; err != nil {
@@ -95,11 +103,45 @@ func UserIKat(UIK []Detail_category) (bool, error) {
 	return true, nil
 }
 
-/*
-func Uprof(up User) (bool, error) {
+//login admin
+func LoginAdmin(auth Auth) (bool, error, string) {
+	var account Admin
+	if err := DB.Where(&Admin{Username: auth.Username}).First(&account).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, errors.Errorf("Account not found"), ""
+		}
+	}
 
-	//if err := DB.Where(i).Error; err != nil {
+	err := utils.HashComparator([]byte(account.Password), []byte(auth.Password))
+	if err != nil {
+		return false, errors.Errorf("Incorrect Password"), ""
+	} else {
+
+		sign := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"name": auth.Username,
+			//"account_number": account.AccountNumber,
+		})
+
+		token, err := sign.SignedString([]byte("secret"))
+		if err != nil {
+			return false, err, ""
+		}
+		return true, nil, token
+	}
+}
+
+//admin melihat list user
+func GetLUser(ul []User) []User {
+	DB.Find(&ul)
+	fmt.Println(ul)
+	return ul
+}
+
+//akun admin baru
+func InsertNewAdmin(account Admin) (bool, error) {
+	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
+	//DB.Create(&account)
 	return true, nil
-}*/
+}

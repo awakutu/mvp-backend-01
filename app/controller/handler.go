@@ -228,3 +228,89 @@ func UpdateProfil(c *gin.Context) {
 		"Rows_update": b,
 	}, http.StatusOK, "success")
 }
+
+func GetListUser(c *gin.Context) {
+	var usr []model.User
+	/*if err := c.Bind(&u); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}*/
+	//uID := c.Param("id")
+
+	res := model.GetLUser(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		//"ID":       u.ID,
+		//"Username": u.Username,
+		"Data": res,
+	}, http.StatusOK, "success")
+}
+
+func CreateAdmin(c *gin.Context) {
+
+	var account model.Admin
+	if err := c.Bind(&account); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	pass, err := utils.HashGenerator(account.Password)
+	if err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	account.Password = pass
+	flag, err := model.InsertNewAdmin(account)
+	if flag {
+		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func LoginAdmin(c *gin.Context) {
+	var auth model.Auth
+	if err := c.Bind(&auth); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	log.Println("LOGIN")
+	flag, err, token := model.LoginAdmin(auth)
+	if flag {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"token": token,
+		}, http.StatusOK, "success")
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func AccepAdmin(c *gin.Context) {
+	var account model.User
+
+	if err := c.Bind(&account); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	pass, err := utils.HashGenerator(account.Password)
+	if err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println(account.Username)
+	account.Password = pass
+
+	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Updates(account)
+	b := q.RowsAffected
+
+	fmt.Println(q, account)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":         account,
+		"Row affected": b,
+	}, http.StatusOK, "success")
+
+}
