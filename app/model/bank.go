@@ -78,6 +78,7 @@ func InsertNewAccount(account User) (bool, error) {
 	return true, nil
 }
 
+//get list kategori
 func GetKateogi(kat []Kategori) []Kategori {
 
 	//var account User
@@ -93,6 +94,7 @@ func GetKateogi(kat []Kategori) []Kategori {
 	return kat
 }
 
+//insert kategori from user
 func UserIKat(UIK []Detail_category) (bool, error) {
 
 	if err := DB.Create(&UIK).Error; err != nil {
@@ -101,8 +103,44 @@ func UserIKat(UIK []Detail_category) (bool, error) {
 	return true, nil
 }
 
+//login admin
+func LoginAdmin(auth Auth) (bool, error, string) {
+	var account Admin
+	if err := DB.Where(&Admin{Username: auth.Username}).First(&account).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, errors.Errorf("Account not found"), ""
+		}
+	}
+
+	err := utils.HashComparator([]byte(account.Password), []byte(auth.Password))
+	if err != nil {
+		return false, errors.Errorf("Incorrect Password"), ""
+	} else {
+
+		sign := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"name": auth.Username,
+			//"account_number": account.AccountNumber,
+		})
+
+		token, err := sign.SignedString([]byte("secret"))
+		if err != nil {
+			return false, err, ""
+		}
+		return true, nil, token
+	}
+}
+
+//admin melihat list user
 func GetLUser(ul []User) []User {
 	DB.Find(&ul)
 	fmt.Println(ul)
 	return ul
+}
+
+//akun admin baru
+func InsertNewAdmin(account Admin) (bool, error) {
+	if err := DB.Create(&account).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
 }

@@ -24,7 +24,7 @@ func Auth(c *gin.Context) {
 		claims := token.Claims.(jwt.MapClaims)
 		fmt.Println(claims)
 		var idAccount int
-		err := mapstructure.Decode(claims["username"], &idAccount)
+		err := mapstructure.Decode(claims["account_number"], &idAccount)
 		if err != nil {
 			result := gin.H{
 				"message": err.Error(),

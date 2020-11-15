@@ -245,3 +245,43 @@ func GetListUser(c *gin.Context) {
 		"Data": res,
 	}, http.StatusOK, "success")
 }
+
+func CreateAdmin(c *gin.Context) {
+
+	var account model.Admin
+	if err := c.Bind(&account); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	pass, err := utils.HashGenerator(account.Password)
+	if err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	account.Password = pass
+	flag, err := model.InsertNewAdmin(account)
+	if flag {
+		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func LoginAdmin(c *gin.Context) {
+	var auth model.Auth
+	if err := c.Bind(&auth); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	log.Println("LOGIN")
+	flag, err, token := model.LoginAdmin(auth)
+	if flag {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"token": token,
+		}, http.StatusOK, "success")
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+	}
+}
