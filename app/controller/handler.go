@@ -228,3 +228,20 @@ func UpdateProfil(c *gin.Context) {
 		"Rows_update": b,
 	}, http.StatusOK, "success")
 }
+
+func GetListUser(c *gin.Context) {
+	var usr []model.User
+	/*if err := c.Bind(&u); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}*/
+	//uID := c.Param("id")
+
+	res := model.GetLUser(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		//"ID":       u.ID,
+		//"Username": u.Username,
+		"Data": res,
+	}, http.StatusOK, "success")
+}

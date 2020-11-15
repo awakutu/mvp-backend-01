@@ -31,5 +31,9 @@ func main() {
 
 	router.POST("/api/profil/:username/update", middleware.Auth, controller.UpdateProfil)
 	//curl  localhost:8084/api/profil/farhani/update -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' -H 'content-type:application/json' -d '{"name":"Farhan", "phone":"082251983584"}'
+
+	router.GET("/api/admin/listuser", middleware.Auth, controller.UpdateProfil)
+	//curl  localhost:8084/api/profil/farhani/update -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' -H 'content-type:application/json' -d '{"name":"Farhan", "phone":"082251983584"}'
+
 	router.Run(":8084")
 }
