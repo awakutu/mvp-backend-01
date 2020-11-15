@@ -18,7 +18,7 @@ type User struct {
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	Ttl      string `json:"ttl"`
-	Foto     string `json:"foto"`
+	Foto     []byte `json:"foto"`
 	Status   bool
 }
 
@@ -142,5 +142,6 @@ func InsertNewAdmin(account Admin) (bool, error) {
 	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
+	//DB.Create(&account)
 	return true, nil
 }

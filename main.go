@@ -47,5 +47,7 @@ func main() {
 	router.GET("/api/admin/listuser", middleware.Auth, controller.GetListUser)
 	//curl  localhost:8084/api/profil/farhani/update -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' | json_pp
 
+	router.POST("api/admin/updateuser", middleware.Auth, controller.AccepAdmin)
+
 	router.Run(":8084")
 }

@@ -285,3 +285,32 @@ func LoginAdmin(c *gin.Context) {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 	}
 }
+
+func AccepAdmin(c *gin.Context) {
+	var account model.User
+
+	if err := c.Bind(&account); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	pass, err := utils.HashGenerator(account.Password)
+	if err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println(account.Username)
+	account.Password = pass
+
+	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Updates(account)
+	b := q.RowsAffected
+
+	fmt.Println(q, account)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":         account,
+		"Row affected": b,
+	}, http.StatusOK, "success")
+
+}
