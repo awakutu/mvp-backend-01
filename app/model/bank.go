@@ -23,7 +23,7 @@ type User struct {
 }
 
 type Auth struct {
-	Username string `json:"name"`
+	Username string `json:"Username"`
 	Password string `json:"password"`
 }
 
@@ -58,7 +58,7 @@ func Login(auth Auth) (bool, error, string) {
 	} else {
 
 		sign := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"name": auth.Username,
+			"username": auth.Username,
 			//"account_number": account.AccountNumber,
 		})
 
