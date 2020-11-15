@@ -18,18 +18,18 @@ func main() {
 	router.POST("/api/verifikasi", controller.Verifikasi)
 
 	router.GET("/api/verifikasi/:email", controller.VerifikasiSent)
+	//	curl localhost:8084/api/login -H 'content-type:application/json' -d '{"username": "farhani", "password":"farhan"}'
 
-	/*
-		curl localhost:8084/api/login -H 'content-type:application/json' -d '{"username": "farhani", "password":"farhan"}'
-	*/
 	router.GET("/api/pref/:id", middleware.Auth, controller.GetKategori)
-	/*
-		curl localhost:8084/api/pref/farhani -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU'
-	*/
+	//curl localhost:8084/api/pref/farhani -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU'
 
 	router.POST("/api/prefInsert", middleware.Auth, controller.CreateUserKag)
-
 	//curl localhost:8084/api/prefInsert -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' -H 'content-type:application/json' -d '{"id_user":1,"id_kategori":1, "jenis_kategori":"Keuangan"}'
 
+	router.GET("/api/profil/:username", middleware.Auth, controller.GetProfil)
+	//curl 13.250.111.2:8084/api/profil/farhani -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU'''
+
+	router.POST("/api/profil/:username/update", middleware.Auth, controller.UpdateProfil)
+	//curl  localhost:8084/api/profil/farhani/update -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiIn0.-CmeD9djX3ZzMWQ6kmE_W11Cbk1ZmZCSqtl_bgk_GNU' -H 'content-type:application/json' -d '{"name":"Farhan", "phone":"082251983584"}'
 	router.Run(":8084")
 }

@@ -13,12 +13,12 @@ import (
 type User struct {
 	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Username string `json:"Username"`
-	Password string `json:"password,omitempty"`
-	Nama     string `json:"name,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Phone    string `json:"phone,omitempty"`
-	Ttl      string `json:"ttl,omitempty"`
-	Foto     string `json:"foto,omitempty"`
+	Password string `json:"password"`
+	Nama     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Ttl      string `json:"ttl"`
+	Foto     string `json:"foto"`
 	Status   bool
 }
 
@@ -87,10 +87,19 @@ func GetKateogi(kat []Kategori) []Kategori {
 	return kat
 }
 
-func UserIKat(UIK Detail_category) (bool, error) {
+func UserIKat(UIK []Detail_category) (bool, error) {
 
 	if err := DB.Create(&UIK).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
 	return true, nil
 }
+
+/*
+func Uprof(up User) (bool, error) {
+
+	//if err := DB.Where(i).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}*/
