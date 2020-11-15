@@ -44,10 +44,6 @@ type Admin struct {
 	Password string `json:"password"`
 }
 
-type Tes struct {
-	Foto []byte `json:"foto"`
-}
-
 func Login(auth Auth) (bool, error, string) {
 	var account User
 	if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
