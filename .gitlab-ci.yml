@@ -3,12 +3,12 @@ production:
     stage: deploy
     before_script:
         - mkdir -p ~/.ssh
-        - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        - echo -e "$SSH_PRIVATE_KEY1" > ~/.ssh/id_rsa
         - chmod 600 ~/.ssh/id_rsa
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     script:
-        #- go mod vendor # tidak usah kalo folder vendor ikut dicommit
-        - go build -o main.exe main.go 
-        - scp main.exe ubuntu@$DEPLOY_SERVER:/home/ubuntu/cocreate
+        - go build -o main main.go 
+        - scp . .
+        - scp main ubuntu@$DEPLOY_SERVER1:/home/ubuntu/mvp
     environment:
         name: production
