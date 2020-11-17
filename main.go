@@ -3,14 +3,35 @@ package main
 import (
 	"CoCreate/app/controller"
 	"CoCreate/app/middleware"
+	"log"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
+
+	token, err := controller.RandToken(64)
+	if err != nil {
+		log.Fatal("unable to generate random token: ", err)
+	}
+	store := sessions.NewCookieStore([]byte(token))
+
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	router.Use(sessions.Sessions("cocreate", store))
+
+	router.GET("/auth", controller.AuthHandler)
+	router.GET("/login", controller.LoginHandler)
+
+	authorized := router.Group("/battle")
+	authorized.Use(middleware.AuthorizeRequest())
+	{
+		authorized.GET("/field", controller.FieldHandler)
+	}
 
 	//user
 	//------------------------------------------------------------------
@@ -22,6 +43,7 @@ func main() {
 	router.POST("/api/prefInsert", middleware.Auth, controller.CreateUserKag)
 	router.GET("/api/profil/:username", middleware.Auth, controller.GetProfil)
 	router.POST("/api/profil/:username/update", middleware.Auth, controller.UpdateProfil)
+	router.POST("/api/insertGDB")
 
 	//admin
 	//------------------------------------------------------------------

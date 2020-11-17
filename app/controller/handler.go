@@ -422,3 +422,29 @@ func DecLike(c *gin.Context) {
 		"Data": S2,
 	}, http.StatusOK, "success")
 }
+
+func Insertgdata(c *gin.Context) {
+	var gd model.Goguser
+	var account model.User
+	var accountT model.UserTemporary
+
+	if err := c.Bind(&gd); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	gd.JSON.Email = account.Email
+	gd.JSON.Email = accountT.Email
+
+	//	gd.
+
+	/*flag, err := model.InsertNewAccount(gd)
+	if flag {
+		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}*/
+
+}
