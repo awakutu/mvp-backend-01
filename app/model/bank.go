@@ -11,6 +11,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	layoutDateTime = "2006-01-02 15:04:05"
+)
+
 type User struct {
 	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Username string `json:"Username"`
@@ -53,12 +57,11 @@ type Posting struct {
 	Share_pos string     `json:"share_pos"`
 	Tgl_pos   *time.Time `json:"tgl_pos"`
 	Username  string     `json:"username"`
-	//Comment   string     `json:"comment"`
 }
 
 type Comment struct {
 	ID         int        `gorm:"primary_key";auto_increment;not_null json:"-"`
-	isi_co     string     `json:"title"`
+	Isi_co     string     `json:"title"`
 	Deskripsi  string     `json:"deskripsi"`
 	Tgl_co     *time.Time `json:"tgl_pos"`
 	Username   string     `json:"username"`
@@ -174,7 +177,6 @@ func Detailpost(post Posting) (bool, error) {
 }
 
 func GetAllPost(post []Posting) []Posting {
-	//	func GetLUser(ul []User) []User {
 	DB.Find(&post)
 	fmt.Println(post)
 	return post
@@ -184,6 +186,5 @@ func InsertPost(pos Posting) (bool, error) {
 	if err := DB.Create(&pos).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
-	//DB.Create(&account)
 	return true, nil
 }

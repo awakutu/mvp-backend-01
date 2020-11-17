@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"gopkg.in/gomail.v2"
 
@@ -231,17 +232,9 @@ func UpdateProfil(c *gin.Context) {
 
 func GetListUser(c *gin.Context) {
 	var usr []model.User
-	/*if err := c.Bind(&u); err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}*/
-	//uID := c.Param("id")
-
 	res := model.GetLUser(usr)
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		//"ID":       u.ID,
-		//"Username": u.Username,
 		"Data": res,
 	}, http.StatusOK, "success")
 }
@@ -296,6 +289,7 @@ func AccepAdmin(c *gin.Context) {
 
 	//i := len(account)
 	//for i
+	//
 
 	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Update("status", account.Status)
 	b := q.RowsAffected
@@ -333,6 +327,11 @@ func InserPost(c *gin.Context) {
 		return
 	}
 
+	now := time.Now()
+	//secs := now.UnixNano()
+
+	usr.Tgl_pos = &now
+
 	flag, err := model.InsertPost(usr)
 	if flag {
 		utils.WrapAPISuccess(c, "success", http.StatusOK)
@@ -341,5 +340,55 @@ func InserPost(c *gin.Context) {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
+}
 
+//like
+type SumLike struct {
+	Like int `json:"like"`
+}
+
+type SumLikeRes struct {
+	Like int `json:"like"`
+}
+
+func IncLike(c *gin.Context) {
+	var li model.Posting
+
+	if err := c.Bind(&li); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sk := c.Param("id")
+
+	//	var S1 SumLike
+	var S2 SumLikeRes
+	model.DB.Where("id=? ", sk).Find(&li)
+
+	model.DB.Model(&li).Where("id= ?", sk).Update("like", li.Like+1).Scan(&S2)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": S2,
+	}, http.StatusOK, "success")
+}
+
+func DecLike(c *gin.Context) {
+	var li model.Posting
+
+	if err := c.Bind(&li); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sk := c.Param("id")
+
+	//var S1 SumLike
+	var S2 SumLikeRes
+	model.DB.Where("id=? ", sk).Find(&li)
+
+	model.DB.Model(&li).Where("id= ?", sk).Update("like", li.Like-1).Scan(&S2)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": S2,
+	}, http.StatusOK, "success")
 }
