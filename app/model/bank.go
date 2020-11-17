@@ -16,15 +16,16 @@ const (
 )
 
 type User struct {
-	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Username string `json:"Username"`
-	Password string `json:"password"`
-	Nama     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Ttl      string `json:"ttl"`
-	Foto     []byte `json:"foto"`
-	Status   bool   `json:status`
+	ID         int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username   string `json:"Username"`
+	Password   string `json:"password"`
+	Nama       string `json:"name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Ttl        string `json:"ttl"`
+	Foto       []byte `json:"foto"`
+	Status     string `json:"status"`
+	Verifikasi string `json:"verifikasi"`
 }
 
 type Auth struct {
@@ -68,6 +69,22 @@ type Comment struct {
 	ID_posting int        `json:"id_post"`
 }
 
+func checkMail(user User) (bool, error) {
+	err := DB.Where(&User{Email: user.Email}).First(&user)
+	if err.RowsAffected == 1 {
+		return false, errors.Errorf("Account sudah terdaftar")
+	}
+	return true, nil
+}
+
+func checkUsername(user User) (bool, error) {
+	err := DB.Where(&User{Email: user.Email}).First(&user)
+	if err.RowsAffected == 1 {
+		return false, errors.Errorf("Account sudah terdaftar")
+	}
+	return true, nil
+}
+
 func Login(auth Auth) (bool, error, string) {
 	var account User
 	if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
@@ -96,6 +113,8 @@ func Login(auth Auth) (bool, error, string) {
 
 func InsertNewAccount(account User) (bool, error) {
 
+	//checkUsername(account)
+	//checkMail(account)
 	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
@@ -104,16 +123,7 @@ func InsertNewAccount(account User) (bool, error) {
 
 //get list kategori
 func GetKateogi(kat []Kategori) []Kategori {
-
-	//var account User
-	//res := map[string]interface{}{}
 	DB.Find(&kat)
-	/*if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return false, errors.Errorf("Account not found"), ""
-		}
-	}*/
-
 	fmt.Println(kat)
 	return kat
 }
@@ -135,7 +145,6 @@ func LoginAdmin(auth Auth) (bool, error, string) {
 			return false, errors.Errorf("Account not found"), ""
 		}
 	}
-
 	err := utils.HashComparator([]byte(account.Password), []byte(auth.Password))
 	if err != nil {
 		return false, errors.Errorf("Incorrect Password"), ""
@@ -166,7 +175,6 @@ func InsertNewAdmin(account Admin) (bool, error) {
 	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
-	//DB.Create(&account)
 	return true, nil
 }
 
