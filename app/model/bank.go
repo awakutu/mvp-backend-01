@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"time"
 
 	"CoCreate/app/utils"
 
@@ -42,6 +43,16 @@ type Admin struct {
 	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type Posting struct {
+	ID        int        `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Title     string     `json:"title"`
+	Deskripsi string     `json:"deskripsi"`
+	Comment   string     `json:"comment"`
+	Like      int        `json:"like"`
+	Share_pos string     `json:"share_pos"`
+	Tgl_pos   *time.Time `json:"tgl_pos"`
 }
 
 func Login(auth Auth) (bool, error, string) {

@@ -122,7 +122,7 @@ func Verifikasi(c *gin.Context) {
 	mailer.SetHeader("To", v.Email)
 	//mailer.SetAddressHeader("Cc", "tralalala@gmail.com", "Tra Lala La")
 	mailer.SetHeader("Subject", "Test mail")
-	mailer.SetBody("text/html", "Verifikasi email : http://13.250.111.2:8084/api/verifikasi/"+v.Email)
+	mailer.SetBody("text/html", "Verifikasi email : http://3.15.137.94:8084/api/verifikasi/"+v.Email)
 	//mailer.Attach("./sample.png")
 
 	dialer := gomail.NewDialer(
