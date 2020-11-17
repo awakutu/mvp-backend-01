@@ -11,6 +11,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	layoutDateTime = "2006-01-02 15:04:05"
+)
+
 type User struct {
 	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Username string `json:"Username"`
@@ -20,7 +24,19 @@ type User struct {
 	Phone    string `json:"phone"`
 	Ttl      string `json:"ttl"`
 	Foto     []byte `json:"foto"`
-	Status   bool   `json:status`
+	Status   string `json:"status"`
+}
+
+type UserTemporary struct {
+	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username string `json:"Username"`
+	Password string `json:"password"`
+	Nama     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Ttl      string `json:"ttl"`
+	Foto     []byte `json:"foto"`
+	Status   string `json:"status"`
 }
 
 type Auth struct {
@@ -49,10 +65,35 @@ type Posting struct {
 	ID        int        `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Title     string     `json:"title"`
 	Deskripsi string     `json:"deskripsi"`
-	Comment   string     `json:"comment"`
 	Like      int        `json:"like"`
 	Share_pos string     `json:"share_pos"`
 	Tgl_pos   *time.Time `json:"tgl_pos"`
+	Username  string     `json:"username"`
+}
+
+type Comment struct {
+	ID         int        `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Isi_co     string     `json:"title"`
+	Deskripsi  string     `json:"deskripsi"`
+	Tgl_co     *time.Time `json:"tgl_pos"`
+	Username   string     `json:"username"`
+	ID_posting int        `json:"id_post"`
+}
+
+func checkMail(user User) (bool, error) {
+	err := DB.Where(&User{Email: user.Email}).First(&user)
+	if err.RowsAffected == 1 {
+		return false, errors.Errorf("Account sudah terdaftar")
+	}
+	return true, nil
+}
+
+func checkUsername(user User) (bool, error) {
+	err := DB.Where(&User{Email: user.Email}).First(&user)
+	if err.RowsAffected == 1 {
+		return false, errors.Errorf("Account sudah terdaftar")
+	}
+	return true, nil
 }
 
 func Login(auth Auth) (bool, error, string) {
@@ -89,18 +130,17 @@ func InsertNewAccount(account User) (bool, error) {
 	return true, nil
 }
 
+func InsertNewAccountTemp(account UserTemporary) (bool, error) {
+
+	if err := DB.Create(&account).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
 //get list kategori
 func GetKateogi(kat []Kategori) []Kategori {
-
-	//var account User
-	//res := map[string]interface{}{}
 	DB.Find(&kat)
-	/*if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return false, errors.Errorf("Account not found"), ""
-		}
-	}*/
-
 	fmt.Println(kat)
 	return kat
 }
@@ -122,7 +162,6 @@ func LoginAdmin(auth Auth) (bool, error, string) {
 			return false, errors.Errorf("Account not found"), ""
 		}
 	}
-
 	err := utils.HashComparator([]byte(account.Password), []byte(auth.Password))
 	if err != nil {
 		return false, errors.Errorf("Incorrect Password"), ""
@@ -142,7 +181,7 @@ func LoginAdmin(auth Auth) (bool, error, string) {
 }
 
 //admin melihat list user
-func GetLUser(ul []User) []User {
+func GetLUser(ul []UserTemporary) []UserTemporary {
 	DB.Find(&ul)
 	fmt.Println(ul)
 	return ul
@@ -153,6 +192,24 @@ func InsertNewAdmin(account Admin) (bool, error) {
 	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
-	//DB.Create(&account)
+	return true, nil
+}
+
+//posting
+func Detailpost(post Posting) (bool, error) {
+	//masih kosong
+	return true, nil
+}
+
+func GetAllPost(post []Posting) []Posting {
+	DB.Find(&post)
+	fmt.Println(post)
+	return post
+}
+
+func InsertPost(pos Posting) (bool, error) {
+	if err := DB.Create(&pos).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
 	return true, nil
 }

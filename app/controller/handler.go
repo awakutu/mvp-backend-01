@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"gopkg.in/gomail.v2"
 
@@ -20,6 +21,7 @@ type Verif struct {
 func CreateAccount(c *gin.Context) {
 
 	var account model.User
+	var accountT model.UserTemporary
 	if err := c.Bind(&account); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
@@ -30,7 +32,34 @@ func CreateAccount(c *gin.Context) {
 		return
 	}
 	account.Password = pass
+
+	q := model.DB.Where("username=?", account.Username).First(&account)
+
+	b := q.RowsAffected
+	if b == 1 {
+		utils.WrapAPIError(c, "Username Sudah ada", http.StatusOK)
+		return
+	}
+
+	q2 := model.DB.Where("email=?", account.Email).First(&account)
+
+	b2 := q2.RowsAffected
+	if b2 == 1 {
+		utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK)
+		return
+	}
+
 	flag, err := model.InsertNewAccount(account)
+
+	accountT.ID = account.ID
+	accountT.Email = account.Email
+	accountT.Nama = account.Nama
+	accountT.Password = account.Password
+	accountT.Phone = account.Phone
+	accountT.Status = account.Status
+	accountT.Ttl = account.Ttl
+	accountT.Username = account.Username
+	model.InsertNewAccountTemp(accountT)
 	if flag {
 		utils.WrapAPISuccess(c, "success", http.StatusOK)
 		return
@@ -40,13 +69,34 @@ func CreateAccount(c *gin.Context) {
 	}
 }
 
+func CreateAccountTEmp(c *gin.Context) {
+
+	var account model.UserTemporary
+	if err := c.Bind(&account); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	model.InsertNewAccountTemp(account)
+}
+
 func Login(c *gin.Context) {
 	var auth model.Auth
+	var account model.UserTemporary
 	if err := c.Bind(&auth); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 	log.Println("LOGIN")
+
+	q := model.DB.Where("username=?", auth.Username).First(&account)
+
+	b := q.RowsAffected
+	if b == 1 {
+		utils.WrapAPIError(c, "Username Belum diapprove", http.StatusOK)
+		return
+	}
+
 	flag, err, token := model.Login(auth)
 	if flag {
 		utils.WrapAPIData(c, map[string]interface{}{
@@ -161,7 +211,7 @@ func VerifikasiSent(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "Tidak ada email tersebut"})
 	}*/
 
-	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("status", true)
+	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("verifikasi", "aktif")
 	if err1 != nil {
 		utils.WrapAPISuccess(c, "success", http.StatusOK)
 		return
@@ -174,19 +224,11 @@ func VerifikasiSent(c *gin.Context) {
 func GetProfil(c *gin.Context) {
 	//var ka []model.Kategori
 	var u model.User
-	//if err := c.Bind(&u); err != nil {
-	//	utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
-	//log.Println("LOGIN")
+
 	uID := c.Param("username")
 
 	q := model.DB.Where("username=?", uID).Find(&u)
 	fmt.Println(q, &uID, u.ID)
-	//if u.Username == "" {
-	//	c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "tidak ditemukan"})
-	//	}
-
 	model.DB.Find(&u)
 
 	utils.WrapAPIData(c, map[string]interface{}{
@@ -209,8 +251,6 @@ func UpdateProfil(c *gin.Context) {
 
 	fmt.Println(sk1.ID)
 
-	//sk1.ID
-
 	pass, err := utils.HashGenerator(usk.Password)
 	if err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -220,7 +260,6 @@ func UpdateProfil(c *gin.Context) {
 	usk.Password = pass
 
 	result := model.DB.Model(model.User{}).Where("id = ?", sk1.ID).Updates(usk)
-
 	b := result.RowsAffected
 
 	utils.WrapAPIData(c, map[string]interface{}{
@@ -230,18 +269,10 @@ func UpdateProfil(c *gin.Context) {
 }
 
 func GetListUser(c *gin.Context) {
-	var usr []model.User
-	/*if err := c.Bind(&u); err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}*/
-	//uID := c.Param("id")
-
+	var usr []model.UserTemporary
 	res := model.GetLUser(usr)
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		//"ID":       u.ID,
-		//"Username": u.Username,
 		"Data": res,
 	}, http.StatusOK, "success")
 }
@@ -287,24 +318,107 @@ func LoginAdmin(c *gin.Context) {
 }
 
 func AccepAdmin(c *gin.Context) {
-	var account model.User
+	var account1 []model.UserTemporary
 
-	if err := c.Bind(&account); err != nil {
+	if err := c.Bind(&account1); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	//i := len(account)
-	//for i
+	//fmt.Println(account)
 
-	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Update("status", account.Status)
+	//q := model.DB.Save(&account)
+	q := model.DB.Delete(&account1)
 	b := q.RowsAffected
 
-	fmt.Println(q, account)
-
 	utils.WrapAPIData(c, map[string]interface{}{
-		"Data":         account,
+		"Data":         account1,
 		"Row affected": b,
 	}, http.StatusOK, "success")
 
+}
+
+//POST
+func GetListPost(c *gin.Context) {
+	var usr []model.Posting
+
+	res := model.GetAllPost(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": res,
+	}, http.StatusOK, "success")
+}
+
+func InserPost(c *gin.Context) {
+	var usr model.Posting
+	//ar account model.Admin
+	if err := c.Bind(&usr); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	now := time.Now()
+	//secs := now.UnixNano()
+
+	usr.Tgl_pos = &now
+
+	flag, err := model.InsertPost(usr)
+	if flag {
+		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+//like
+type SumLike struct {
+	Like int `json:"like"`
+}
+
+type SumLikeRes struct {
+	Like int `json:"like"`
+}
+
+func IncLike(c *gin.Context) {
+	var li model.Posting
+
+	if err := c.Bind(&li); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sk := c.Param("id")
+
+	//	var S1 SumLike
+	var S2 SumLikeRes
+	model.DB.Where("id=? ", sk).Find(&li)
+
+	model.DB.Model(&li).Where("id= ?", sk).Update("like", li.Like+1).Scan(&S2)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": S2,
+	}, http.StatusOK, "success")
+}
+
+func DecLike(c *gin.Context) {
+	var li model.Posting
+
+	if err := c.Bind(&li); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sk := c.Param("id")
+
+	//var S1 SumLike
+	var S2 SumLikeRes
+	model.DB.Where("id=? ", sk).Find(&li)
+
+	model.DB.Model(&li).Where("id= ?", sk).Update("like", li.Like-1).Scan(&S2)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": S2,
+	}, http.StatusOK, "success")
 }
