@@ -16,16 +16,27 @@ const (
 )
 
 type User struct {
-	ID         int    `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Username   string `json:"Username"`
-	Password   string `json:"password"`
-	Nama       string `json:"name"`
-	Email      string `json:"email"`
-	Phone      string `json:"phone"`
-	Ttl        string `json:"ttl"`
-	Foto       []byte `json:"foto"`
-	Status     string `json:"status"`
-	Verifikasi string `json:"verifikasi"`
+	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username string `json:"Username"`
+	Password string `json:"password"`
+	Nama     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Ttl      string `json:"ttl"`
+	Foto     []byte `json:"foto"`
+	Status   string `json:"status"`
+}
+
+type UserTemporary struct {
+	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username string `json:"Username"`
+	Password string `json:"password"`
+	Nama     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Ttl      string `json:"ttl"`
+	Foto     []byte `json:"foto"`
+	Status   string `json:"status"`
 }
 
 type Auth struct {
@@ -113,8 +124,14 @@ func Login(auth Auth) (bool, error, string) {
 
 func InsertNewAccount(account User) (bool, error) {
 
-	//checkUsername(account)
-	//checkMail(account)
+	if err := DB.Create(&account).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
+func InsertNewAccountTemp(account UserTemporary) (bool, error) {
+
 	if err := DB.Create(&account).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
@@ -164,7 +181,7 @@ func LoginAdmin(auth Auth) (bool, error, string) {
 }
 
 //admin melihat list user
-func GetLUser(ul []User) []User {
+func GetLUser(ul []UserTemporary) []UserTemporary {
 	DB.Find(&ul)
 	fmt.Println(ul)
 	return ul

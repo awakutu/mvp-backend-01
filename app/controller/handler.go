@@ -21,6 +21,7 @@ type Verif struct {
 func CreateAccount(c *gin.Context) {
 
 	var account model.User
+	var accountT model.UserTemporary
 	if err := c.Bind(&account); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
@@ -49,6 +50,16 @@ func CreateAccount(c *gin.Context) {
 	}
 
 	flag, err := model.InsertNewAccount(account)
+
+	accountT.ID = account.ID
+	accountT.Email = account.Email
+	accountT.Nama = account.Nama
+	accountT.Password = account.Password
+	accountT.Phone = account.Phone
+	accountT.Status = account.Status
+	accountT.Ttl = account.Ttl
+	accountT.Username = account.Username
+	model.InsertNewAccountTemp(accountT)
 	if flag {
 		utils.WrapAPISuccess(c, "success", http.StatusOK)
 		return
@@ -58,13 +69,34 @@ func CreateAccount(c *gin.Context) {
 	}
 }
 
+func CreateAccountTEmp(c *gin.Context) {
+
+	var account model.UserTemporary
+	if err := c.Bind(&account); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	model.InsertNewAccountTemp(account)
+}
+
 func Login(c *gin.Context) {
 	var auth model.Auth
+	var account model.UserTemporary
 	if err := c.Bind(&auth); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 	log.Println("LOGIN")
+
+	q := model.DB.Where("username=?", auth.Username).First(&account)
+
+	b := q.RowsAffected
+	if b == 1 {
+		utils.WrapAPIError(c, "Username Belum diapprove", http.StatusOK)
+		return
+	}
+
 	flag, err, token := model.Login(auth)
 	if flag {
 		utils.WrapAPIData(c, map[string]interface{}{
@@ -237,7 +269,7 @@ func UpdateProfil(c *gin.Context) {
 }
 
 func GetListUser(c *gin.Context) {
-	var usr []model.User
+	var usr []model.UserTemporary
 	res := model.GetLUser(usr)
 
 	utils.WrapAPIData(c, map[string]interface{}{
@@ -285,41 +317,23 @@ func LoginAdmin(c *gin.Context) {
 	}
 }
 
-type Ac struct {
-	Email      string `json:"email"`
-	Status     string `json:"status"`
-	Verifikasi string `json:"verifikasi"`
-}
-
-type Ac2 []struct {
-	Email      string `json:"email"`
-	Status     string `json:"status"`
-	Verifikasi string `json:"verifikasi"`
-}
-
 func AccepAdmin(c *gin.Context) {
-	var account model.User
+	var account1 []model.UserTemporary
 
-	//var a Ac2
-	//From(Ac2).SelectT(func(u Ac2) string { return u.Email })
-
-	if err := c.Bind(&account); err != nil {
+	if err := c.Bind(&account1); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	//i := len(account)
-	//for b := 0; b <= i; i++ {
-	//for i, s = range ()
-	q := model.DB.Model(model.User{}).Where("username = ?", account.Username).Update("status", account.Status)
+	//fmt.Println(account)
 
-	//err := model.DB.Preload(account).Find()
-	fmt.Println(q, account)
-	//}
+	//q := model.DB.Save(&account)
+	q := model.DB.Delete(&account1)
+	b := q.RowsAffected
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		//"Data": account,
-		//"Row affected": b,
+		"Data":         account1,
+		"Row affected": b,
 	}, http.StatusOK, "success")
 
 }
@@ -327,11 +341,6 @@ func AccepAdmin(c *gin.Context) {
 //POST
 func GetListPost(c *gin.Context) {
 	var usr []model.Posting
-	/*if err := c.Bind(&u); err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}*/
-	//uID := c.Param("id")
 
 	res := model.GetAllPost(usr)
 
