@@ -308,3 +308,38 @@ func AccepAdmin(c *gin.Context) {
 	}, http.StatusOK, "success")
 
 }
+
+//POST
+func GetListPost(c *gin.Context) {
+	var usr []model.Posting
+	/*if err := c.Bind(&u); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}*/
+	//uID := c.Param("id")
+
+	res := model.GetAllPost(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": res,
+	}, http.StatusOK, "success")
+}
+
+func InserPost(c *gin.Context) {
+	var usr model.Posting
+	//ar account model.Admin
+	if err := c.Bind(&usr); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	flag, err := model.InsertPost(usr)
+	if flag {
+		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+}

@@ -49,5 +49,11 @@ func main() {
 
 	router.POST("/api/admin/updateuser", middleware.Auth, controller.AccepAdmin)
 
+	//posting
+	//------------------------------------------------------------------
+	router.GET("/api/Dashboard", middleware.Auth, controller.GetListPost)
+
+	router.POST("/api/Dashboard", middleware.Auth, controller.InserPost)
+
 	router.Run(":8084")
 }

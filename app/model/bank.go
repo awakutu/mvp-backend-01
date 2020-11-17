@@ -49,10 +49,20 @@ type Posting struct {
 	ID        int        `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Title     string     `json:"title"`
 	Deskripsi string     `json:"deskripsi"`
-	Comment   string     `json:"comment"`
 	Like      int        `json:"like"`
 	Share_pos string     `json:"share_pos"`
 	Tgl_pos   *time.Time `json:"tgl_pos"`
+	Username  string     `json:"username"`
+	//Comment   string     `json:"comment"`
+}
+
+type Comment struct {
+	ID         int        `gorm:"primary_key";auto_increment;not_null json:"-"`
+	isi_co     string     `json:"title"`
+	Deskripsi  string     `json:"deskripsi"`
+	Tgl_co     *time.Time `json:"tgl_pos"`
+	Username   string     `json:"username"`
+	ID_posting int        `json:"id_post"`
 }
 
 func Login(auth Auth) (bool, error, string) {
@@ -151,6 +161,27 @@ func GetLUser(ul []User) []User {
 //akun admin baru
 func InsertNewAdmin(account Admin) (bool, error) {
 	if err := DB.Create(&account).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	//DB.Create(&account)
+	return true, nil
+}
+
+//posting
+func Detailpost(post Posting) (bool, error) {
+	//masih kosong
+	return true, nil
+}
+
+func GetAllPost(post []Posting) []Posting {
+	//	func GetLUser(ul []User) []User {
+	DB.Find(&post)
+	fmt.Println(post)
+	return post
+}
+
+func InsertPost(pos Posting) (bool, error) {
+	if err := DB.Create(&pos).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
 	//DB.Create(&account)

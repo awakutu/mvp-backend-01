@@ -24,6 +24,6 @@ func init() {
 			break
 		}
 	}
-	DB.AutoMigrate(new(User), new(Kategori), new(Detail_category), new(Admin))
+	DB.AutoMigrate(new(User), new(Kategori), new(Detail_category), new(Admin), new(Posting), new(Comment))
 
 }
