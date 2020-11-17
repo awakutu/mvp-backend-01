@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"CoCreate/app/model"
+	"CoCreate/app/utils"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -15,10 +17,24 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	"gorm.io/gorm"
 )
 
 var cred Credentials
 var conf *oauth2.Config
+
+type UserGoogle struct {
+	Sub           string `json:"sub"`
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Profile       string `json:"profile"`
+	Picture       string `json:"picture"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+	Gender        string `json:"gender"`
+	Hd            string `json:"hd"`
+}
 
 // Credentials which stores google ids.
 type Credentials struct {
@@ -53,7 +69,8 @@ func init() {
 	conf = &oauth2.Config{
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
-		RedirectURL:  "http://localhost:8084/auth",
+		//RedirectURL:  "http://kelompok1.dtstakelompok1.com/auth/google/callback",
+		RedirectURL: "http://localhost:8084/auth",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 		},
@@ -109,7 +126,49 @@ func AuthHandler(c *gin.Context) {
 	}
 	//seen := false
 
-	c.JSON(http.StatusOK, gin.H{"email": u.Email})
+	var account model.User
+	var accountT model.UserTemporary
+
+	account.Email = u.Email
+	accountT.Email = u.Email
+
+	account.Nama = u.Name
+	accountT.Nama = u.Name
+
+	account.Status = "Aktif"
+
+	account.Username = u.Name
+	accountT.Username = u.Name
+	//account.Status = "Tidak Aktif"
+
+	if err := model.DB.Where("email=?", u.Email).First(&account).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusOK, gin.H{"eror": err})
+		}
+	} else {
+		utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK)
+	}
+
+	/*b2 := err.RowsAffected
+	if b2 == 1 {
+		utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK)
+		return
+	}*/
+
+	//model.DB.Create(account)
+	//model.DB.Create(accountT)
+	if err := model.DB.Create(&account).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"eror": err})
+	}
+
+	if err := model.DB.Create(&accountT).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"eror": err})
+	}
+
+	model.DB.Where("email= ?", u.Email).Delete(&accountT)
+
+	c.JSON(http.StatusOK, gin.H{"Status": u.Email, "status": "berhasil"})
+	//c.Redirect(301, "http://www.google.com")
 }
 
 func LoginHandler(ctx *gin.Context) {
@@ -121,7 +180,7 @@ func LoginHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	session.Set("state", state)
 	session.Save()
-	ctx.Writer.Write([]byte("<html><title>Golang Google</title> <body> <a href='" + GetLoginURL(state) + "'><button>Lanjutkan!</button> </a> </body></html>"))
+	ctx.Writer.Write([]byte("<html><title>Lanjutkan Sign Google</title> <body> <a href='" + GetLoginURL(state) + "'><button>Lanjutkan!</button> </a> </body></html>"))
 }
 
 func GetLoginURL(state string) string {

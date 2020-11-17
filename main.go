@@ -20,18 +20,21 @@ func main() {
 	}
 	store := sessions.NewCookieStore([]byte(token))
 
+	//-----------------------------------------------------
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(sessions.Sessions("cocreate", store))
 
-	router.GET("/auth", controller.AuthHandler)
-	router.GET("/login", controller.LoginHandler)
+	router.GET("/auth", controller.AuthHandler) //redirect
+	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
+	router.GET("/google", controller.LoginHandler) //localhost
 
-	authorized := router.Group("/battle")
-	authorized.Use(middleware.AuthorizeRequest())
-	{
-		authorized.GET("/field", controller.FieldHandler)
-	}
+	//-----------------------------------------------------
+	//authorized := router.Group("/battle")
+	//authorized.Use(middleware.AuthorizeRequest())
+	//{
+	//	authorized.GET("/field", controller.FieldHandler)
+	//}
 
 	//user
 	//------------------------------------------------------------------
