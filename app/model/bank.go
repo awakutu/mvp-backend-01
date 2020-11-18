@@ -101,8 +101,7 @@ type Posting struct {
 
 type Comment struct {
 	ID         int        `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Isi_co     string     `json:"title"`
-	Deskripsi  string     `json:"deskripsi"`
+	Isi_co     string     `json:"isi"`
 	Tgl_co     *time.Time `json:"tgl_pos"`
 	Username   string     `json:"username"`
 	ID_posting int        `json:"id_post"`
@@ -240,4 +239,17 @@ func InsertPost(pos Posting) (bool, error) {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
 	return true, nil
+}
+
+func InsertCom(com Comment) (bool, error) {
+	if err := DB.Create(&com).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
+func GetAllComPost(com []Comment) []Comment {
+	DB.Find(&com)
+	fmt.Println(com)
+	return com
 }

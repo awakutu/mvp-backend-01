@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"gopkg.in/gomail.v2"
@@ -19,7 +20,7 @@ type Verif struct {
 }
 
 func CreateAccount(c *gin.Context) {
-
+	var at model.User
 	var account model.User
 	var accountT model.UserTemporary
 	if err := c.Bind(&account); err != nil {
@@ -60,8 +61,14 @@ func CreateAccount(c *gin.Context) {
 	accountT.Ttl = account.Ttl
 	accountT.Username = account.Username
 	model.InsertNewAccountTemp(accountT)
+
+	model.DB.Where("email=?", account.Email).First(&at)
+
 	if flag {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Account ID": at.ID,
+			"Username":   account.Username,
+		}, http.StatusOK, "success")
 		return
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -83,6 +90,7 @@ func CreateAccountTEmp(c *gin.Context) {
 func Login(c *gin.Context) {
 	var auth model.Auth
 	var account model.UserTemporary
+	var account1 model.User
 	if err := c.Bind(&auth); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
@@ -90,6 +98,7 @@ func Login(c *gin.Context) {
 	log.Println("LOGIN")
 
 	q := model.DB.Where("username=?", auth.Username).First(&account)
+	model.DB.Where("username=?", auth.Username).First(&account1)
 
 	b := q.RowsAffected
 	if b == 1 {
@@ -100,7 +109,9 @@ func Login(c *gin.Context) {
 	flag, err, token := model.Login(auth)
 	if flag {
 		utils.WrapAPIData(c, map[string]interface{}{
-			"token": token,
+			"token":    token,
+			"username": auth.Username,
+			"ID":       account1.ID,
 		}, http.StatusOK, "success")
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -115,9 +126,10 @@ func GetKategori(c *gin.Context) {
 		return
 	}
 	//log.Println("LOGIN")
-	uID := c.Param("id")
+	uID := c.Param("username")
 
 	q := model.DB.Where("username=?", uID).Find(&u)
+
 	fmt.Println(q, &uID, u.ID)
 	if u.Username == "" {
 		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "tidak ditemukan"})
@@ -143,7 +155,9 @@ func CreateUserKag(c *gin.Context) {
 
 	flag, err := model.UserIKat(usk)
 	if flag {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Data": usk,
+		}, http.StatusOK, "Success")
 		return
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -188,10 +202,11 @@ func Verifikasi(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err.Error())
 	} else {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Email": v.Email,
+		}, http.StatusOK, "success")
 		log.Println("Mail sent!")
 	}
-
 }
 
 func VerifikasiSent(c *gin.Context) {
@@ -213,7 +228,9 @@ func VerifikasiSent(c *gin.Context) {
 
 	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("verifikasi", "aktif")
 	if err1 != nil {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Email": uID,
+		}, http.StatusOK, "success")
 		return
 	} else {
 		utils.WrapAPIError(c, "err1.Error()", http.StatusBadRequest)
@@ -292,7 +309,9 @@ func CreateAdmin(c *gin.Context) {
 	account.Password = pass
 	flag, err := model.InsertNewAdmin(account)
 	if flag {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Data": account,
+		}, http.StatusOK, "success")
 		return
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -310,7 +329,8 @@ func LoginAdmin(c *gin.Context) {
 	flag, err, token := model.LoginAdmin(auth)
 	if flag {
 		utils.WrapAPIData(c, map[string]interface{}{
-			"token": token,
+			"token":    token,
+			"username": auth.Username,
 		}, http.StatusOK, "success")
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -364,7 +384,10 @@ func InserPost(c *gin.Context) {
 
 	flag, err := model.InsertPost(usr)
 	if flag {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Data":  flag,
+			"Data2": usr,
+		}, http.StatusOK, "success")
 		return
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
@@ -423,28 +446,52 @@ func DecLike(c *gin.Context) {
 	}, http.StatusOK, "success")
 }
 
-func Insertgdata(c *gin.Context) {
-	var gd model.Goguser
-	var account model.User
-	var accountT model.UserTemporary
+func InsertCo(c *gin.Context) {
+	var co model.Comment
+	//var account model.User
 
-	if err := c.Bind(&gd); err != nil {
+	if err := c.Bind(&co); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
+	var idp string
+	idp = c.Param("id") //idpostting
 
-	gd.JSON.Email = account.Email
-	gd.JSON.Email = accountT.Email
+	now := time.Now()
+	co.Tgl_co = &now
 
-	//	gd.
+	idp2, err := strconv.Atoi(idp)
+	fmt.Println(idp2, err)
 
-	/*flag, err := model.InsertNewAccount(gd)
+	co.ID_posting = idp2
+
+	flag, err := model.InsertCom(co)
 	if flag {
-		utils.WrapAPISuccess(c, "success", http.StatusOK)
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Data":         flag,
+			"ID Postingan": co.ID,
+		}, http.StatusOK, "success")
 		return
 	} else {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
-	}*/
+	}
+}
 
+func GetListComInPost(c *gin.Context) {
+	var co []model.Comment
+	var co1 model.Comment
+	var p model.Posting
+	var p1 model.Posting
+
+	//var idp string
+	idp := c.Param("id") //idposting
+
+	model.DB.Model(&p).Where("id=?", idp).Scan(&p1)
+	model.DB.Model(&co1).Where("id_posting=?", idp).Scan(&co)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Posting": p1,
+		"Comment": co,
+	}, http.StatusOK, "success")
 }

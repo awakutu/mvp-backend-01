@@ -21,11 +21,12 @@ func main() {
 	store := sessions.NewCookieStore([]byte(token))
 
 	//-----------------------------------------------------
+	//router.
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(sessions.Sessions("cocreate", store))
 
-	router.GET("/auth", controller.AuthHandler) //redirect
+	router.GET("/auth/google/callback", controller.AuthHandler) //redirect
 	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
 	router.GET("/google", controller.LoginHandler) //localhost
 
@@ -42,10 +43,10 @@ func main() {
 	router.POST("/api/login", controller.Login)
 	router.POST("/api/verifikasi", controller.Verifikasi)
 	router.GET("/api/verifikasi/:email", controller.VerifikasiSent)
-	router.GET("/api/pref/:id", middleware.Auth, controller.GetKategori)
+	router.GET("/api/pref/:username", middleware.Auth, controller.GetKategori)
 	router.POST("/api/prefInsert", middleware.Auth, controller.CreateUserKag)
-	router.GET("/api/profil/:username", middleware.Auth, controller.GetProfil)
-	router.POST("/api/profil/:username/update", middleware.Auth, controller.UpdateProfil)
+	router.GET("/api/profile/:username", middleware.Auth, controller.GetProfil)
+	router.POST("/api/profile/:username/update", middleware.Auth, controller.UpdateProfil)
 	router.POST("/api/insertGDB")
 
 	//admin
@@ -64,6 +65,13 @@ func main() {
 	//---------------------------------------------------------------------
 	router.POST("/api/likei/:id", middleware.Auth, controller.IncLike)
 	router.POST("/api/liked/:id", middleware.Auth, controller.DecLike)
+
+	//comment
+	//---------------------------------------------------------------------
+
+	router.GET("/api/posting/:id", middleware.Auth, controller.GetListComInPost)
+
+	router.POST("/api/comment/:id", middleware.Auth, controller.InsertCo)
 
 	router.Run(":8084")
 }

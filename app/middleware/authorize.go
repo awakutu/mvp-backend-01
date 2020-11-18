@@ -11,6 +11,7 @@ import (
 func AuthorizeRequest() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
+		//gin.BasicAuth()
 		v := session.Get("user-id")
 		if v == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "Please login."})
