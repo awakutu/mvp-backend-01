@@ -15,6 +15,34 @@ const (
 	layoutDateTime = "2006-01-02 15:04:05"
 )
 
+type Goguser struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"displayName"`
+	Name        struct {
+		FamilyName string `json:"familyName"`
+		GivenName  string `json:"givenName"`
+	} `json:"name"`
+	Emails []struct {
+		Value    string `json:"value"`
+		Verified bool   `json:"verified"`
+	} `json:"emails"`
+	Photos []struct {
+		Value string `json:"value"`
+	} `json:"photos"`
+	Provider string `json:"provider"`
+	Raw      string `json:"_raw"`
+	JSON     struct {
+		Sub           string `json:"sub"`
+		Name          string `json:"name"`
+		GivenName     string `json:"given_name"`
+		FamilyName    string `json:"family_name"`
+		Picture       string `json:"picture"`
+		Email         string `json:"email"`
+		EmailVerified bool   `json:"email_verified"`
+		Locale        string `json:"locale"`
+	} `json:"_json"`
+}
+
 type User struct {
 	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Username string `json:"Username"`
@@ -73,8 +101,7 @@ type Posting struct {
 
 type Comment struct {
 	ID         int        `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Isi_co     string     `json:"title"`
-	Deskripsi  string     `json:"deskripsi"`
+	Isi_co     string     `json:"isi"`
 	Tgl_co     *time.Time `json:"tgl_pos"`
 	Username   string     `json:"username"`
 	ID_posting int        `json:"id_post"`
@@ -212,4 +239,17 @@ func InsertPost(pos Posting) (bool, error) {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
 	return true, nil
+}
+
+func InsertCom(com Comment) (bool, error) {
+	if err := DB.Create(&com).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
+func GetAllComPost(com []Comment) []Comment {
+	DB.Find(&com)
+	fmt.Println(com)
+	return com
 }
