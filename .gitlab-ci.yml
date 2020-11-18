@@ -8,6 +8,6 @@ production:
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     script:
         - go build -o main main.go 
-        - scp main ubuntu@$DEPLOY_SERVER:/home/ubuntu/
+        - scp main ubuntu@$DEPLOY_SERVER:/home/ubuntu
     environment:
         name: production
