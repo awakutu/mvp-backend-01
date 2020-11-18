@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/contrib/sessions"
@@ -63,7 +62,7 @@ func getLoginURL(state string) string {
 }
 
 func init() {
-	file, err := ioutil.ReadFile("./creds.json")
+	/*file, err := ioutil.ReadFile("./creds.json")
 	if err != nil {
 		log.Printf("File error: %v\n", err)
 		os.Exit(1)
@@ -71,11 +70,11 @@ func init() {
 	if err := json.Unmarshal(file, &cred); err != nil {
 		log.Println("unable to marshal data")
 		return
-	}
+	}*/
 
 	conf = &oauth2.Config{
-		ClientID:     cred.Cid,
-		ClientSecret: cred.Csecret,
+		ClientID:     "913465578188-hai5duusvj9f2h6fv8do8hp79tkpqi5q.apps.googleusercontent.com",
+		ClientSecret: "_hD3IHRGZEd2Bg5ICe4CWm7W",
 		RedirectURL:  "http://kelompok1.dtstakelompok1.com/auth/google/callback",
 		//RedirectURL: "http://localhost:8084/auth",
 		Scopes: []string{
