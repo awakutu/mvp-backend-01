@@ -10,7 +10,7 @@ import (
 var DB *gorm.DB
 
 const (
-	MysqlDsn = `root:@tcp(3.15.137.94)/bank?parseTime=True&charset=utf8`
+	MysqlDsn = `user:@tcp(3.15.137.94)/bank?parseTime=True&charset=utf8`
 )
 
 func init() {
@@ -23,8 +23,8 @@ func init() {
 
 	// DB, err = gorm.Open(mysql.Open(fmt.Sprintf("root:root@tcp(172.18.0.10:3306)/digitalent_bank")), &gorm.Config{})
 	for {
-		DB, err = gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s)/%s", db_u, db_p, db_host, db_name)), &gorm.Config{})
-		//DB, err = gorm.Open(mysql.Open(MysqlDsn), &gorm.Config{})
+		//DB, err = gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s)/%s", db_u, db_p, db_host, db_name)), &gorm.Config{})
+		DB, err = gorm.Open(mysql.Open(MysqlDsn), &gorm.Config{})
 		if err == nil {
 			break
 		}
