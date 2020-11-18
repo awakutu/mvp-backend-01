@@ -9,5 +9,6 @@ production:
     script:
         - go build -o main.exe main.go 
         - scp main.exe ubuntu@$DEPLOY_SERVER:/home/ubuntu
+        - scp creds.json ubuntu@$DEPLOY_SERVER:/home/ubuntu
     environment:
         name: production
