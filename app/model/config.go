@@ -16,7 +16,7 @@ const (
 func init() {
 	var err error
 
-	db_u := "root"           //os.Getenv("DB_U")
+	db_u := "user"           //os.Getenv("DB_U")
 	db_p := ""               //os.Getenv("DB_P")
 	db_host := "3.15.137.94" //os.Getenv("DB_HOST")
 	db_name := "bank"        //os.Getenv("DB_NAME")
