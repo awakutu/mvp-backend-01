@@ -2,6 +2,7 @@ package main
 
 import (
 	"CoCreate/app/controller"
+	"CoCreate/app/middleware"
 	"log"
 
 	"github.com/gin-contrib/cors"
@@ -38,7 +39,7 @@ func main() {
 
 	//user
 	//------------------------------------------------------------------
-	/*router.POST("/api/register", controller.CreateAccount)
+	router.POST("/api/register", controller.CreateAccount)
 	router.POST("/api/login", controller.Login)
 	router.POST("/api/verifikasi", controller.Verifikasi)
 	router.GET("/api/verifikasi/:email", controller.VerifikasiSent)
@@ -70,6 +71,6 @@ func main() {
 
 	router.GET("/api/posting/:id", middleware.Auth, controller.GetListComInPost)
 
-	router.POST("/api/comment/:id", middleware.Auth, controller.InsertCo)*/
+	router.POST("/api/comment/:id", middleware.Auth, controller.InsertCo)
 	router.Run(":8085")
 }
