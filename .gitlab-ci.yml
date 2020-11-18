@@ -7,8 +7,8 @@ production:
         - chmod 600 ~/.ssh/id_rsa
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     script:
-        - go build -o main main.go 
-        - scp main ubuntu@$DEPLOY_SERVER:/home/ubuntu
+        - go build -o main.exe main.go 
+        - scp main.exe ubuntu@$DEPLOY_SERVER:/home/ubuntu
         - scp creds.json ubuntu@$DEPLOY_SERVER:/home/ubuntu
     environment:
         name: production
