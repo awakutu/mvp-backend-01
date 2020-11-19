@@ -44,29 +44,43 @@ type Goguser struct {
 }
 
 type User struct {
-	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Username string `json:"Username"`
-	Password string `json:"password"`
-	Nama     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Ttl      string `json:"ttl"`
-	Foto     []byte `json:"foto"`
-	Status   string `json:"status"`
+	ID         int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username   string `json:"Username"`
+	Password   string `json:"password"`
+	Nama       string `json:"name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Ttl        string `json:"ttl"`
+	Foto       []byte `json:"foto"`
+	Status     string `json:"status"`
+	Verifikasi string `json:"verifikasi"`
 }
 
 type UserTemporary struct {
-	ID       int    `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Username string `json:"Username"`
-	Password string `json:"password"`
-	Nama     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Ttl      string `json:"ttl"`
-	Foto     []byte `json:"foto"`
-	Status   string `json:"status"`
+	ID         int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username   string `json:"Username"`
+	Password   string `json:"password"`
+	Nama       string `json:"name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Ttl        string `json:"ttl"`
+	Foto       []byte `json:"foto"`
+	Status     string `json:"status"`
+	Verifikasi string `json:"verifikasi"`
 }
 
+type UserReject struct {
+	ID         int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Username   string `json:"Username"`
+	Password   string `json:"password"`
+	Nama       string `json:"name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Ttl        string `json:"ttl"`
+	Foto       []byte `json:"foto"`
+	Status     string `json:"status"`
+	Verifikasi string `json:"verifikasi"`
+}
 type Auth struct {
 	Username string `json:"Username"`
 	Password string `json:"password"`
@@ -90,22 +104,37 @@ type Admin struct {
 }
 
 type Posting struct {
-	ID        int        `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Title     string     `json:"title"`
-	Deskripsi string     `json:"deskripsi"`
-	Like      int        `json:"like"`
-	Share_pos string     `json:"share_pos"`
-	Tgl_pos   *time.Time `json:"tgl_pos"`
-	Username  string     `json:"username"`
+	ID        int        `gorm:"column:id";auto_increment;not_null json:"id_post"`
+	Title     string     `gorm:"column:title" json:"title"`
+	Deskripsi string     `gorm:"column:deskripsi" json:"deskripsi"`
+	Like      int        `gorm:"column:like" json:"like"`
+	Share_pos string     `gorm:"column:share_pos" json:"share_pos"`
+	Tgl_pos   *time.Time `gorm:"column:tgl_pos" json:"tgl_pos"`
+	Username  string     `gorm:"column:username" json:"username"`
+	Comment   []Comment  `gorm:"ForeignKey:ID_posting;association_foreignKey:id"; json:"isi`
 }
 
 type Comment struct {
-	ID         int        `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Isi_co     string     `json:"isi"`
-	Tgl_co     *time.Time `json:"tgl_pos"`
-	Username   string     `json:"username"`
-	ID_posting int        `json:"id_post"`
+	ID         int        `gorm:"column:id";auto_increment;not_null json:"id_comment"`
+	Isi_co     string     `gorm:"column:isi_co" json:"isi"`
+	Tgl_co     *time.Time `gorm:"column:tgl_co" json:"tgl_pos"`
+	Username   string     `gorm:"column:username" json:"username"`
+	ID_posting int        `gorm:"column:id_posting" json:"id_post"`
+	//`gorm:"column:id_post" json:"id_post"`
 }
+
+/*type Artikel struct {
+	ID       int        `gorm:"column:id" json:"artikel_id"`
+	Title    string     `gorm:"column:title" json:"title"`
+	Kontent  string     `gorm:"column:kontent" json:"kontent"`
+	Komentar []Komentar `gorm:"Foreignkey:Artikel_ID;association_foreignkey:ID;" json:"komentar"`
+}
+
+type Komentar struct {
+	ID         int    `gorm:"column:id" json:"komentar_id"`
+	Artikel_ID string `gorm:"column:artikel_id" json:"artikel_id"`
+	Komentar   string `gorm:"column:komentar" json:"komentar"`
+}*/
 
 func checkMail(user User) (bool, error) {
 	err := DB.Where(&User{Email: user.Email}).First(&user)
@@ -207,8 +236,15 @@ func LoginAdmin(auth Auth) (bool, error, string) {
 	}
 }
 
-//admin melihat list user
+//admin melihat list user approve
 func GetLUser(ul []UserTemporary) []UserTemporary {
+	DB.Find(&ul)
+	fmt.Println(ul)
+	return ul
+}
+
+//admin melihat list user reject
+func GetLUserRE(ul []UserReject) []UserReject {
 	DB.Find(&ul)
 	fmt.Println(ul)
 	return ul

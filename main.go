@@ -55,10 +55,15 @@ func main() {
 	router.POST("/api/admin/login", controller.LoginAdmin)
 	router.GET("/api/admin/listuser", middleware.Auth, controller.GetListUser)
 	router.POST("/api/admin/updateuser", middleware.Auth, controller.AccepAdmin)
+	router.POST("/api/admin/reject", middleware.Auth, controller.RejectAd)
+	router.POST("/api/admin/rejectoap", middleware.Auth, controller.RejectoApprov)
+	//baru
+	router.GET("/api/admin/listuserej", middleware.Auth, controller.GetListUserRej)
 
 	//posting
 	//------------------------------------------------------------------
 	router.GET("/api/Dashboard", middleware.Auth, controller.GetListPost)
+	router.GET("/api/Dashboard/all", middleware.Auth, controller.GetAllListPost)
 	router.POST("/api/Dashboard", middleware.Auth, controller.InserPost)
 
 	//like
@@ -72,5 +77,7 @@ func main() {
 	router.GET("/api/posting/:id", middleware.Auth, controller.GetListComInPost)
 
 	router.POST("/api/comment/:id", middleware.Auth, controller.InsertCo)
-	router.Run(":8085")
+
+	router.Run(":8084") //port server utama
+	//port server sign in google // router.Run(":8085")
 }

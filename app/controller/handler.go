@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"gopkg.in/gomail.v2"
+	"gorm.io/gorm/clause"
 
 	"github.com/gin-gonic/gin"
 )
@@ -91,6 +92,7 @@ func Login(c *gin.Context) {
 	var auth model.Auth
 	var account model.UserTemporary
 	var account1 model.User
+	var account2 model.UserReject
 	if err := c.Bind(&auth); err != nil {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
@@ -103,6 +105,14 @@ func Login(c *gin.Context) {
 	b := q.RowsAffected
 	if b == 1 {
 		utils.WrapAPIError(c, "Username Belum diapprove", http.StatusOK)
+		return
+	}
+
+	//usename direject hubunngi admin
+	q2 := model.DB.Where("username=?", auth.Username).First(&account2)
+	b2 := q2.RowsAffected
+	if b2 == 1 {
+		utils.WrapAPIError(c, "Username tidak diterima hubungi admin di mvpkelompok1@gmail.com", http.StatusOK)
 		return
 	}
 
@@ -226,7 +236,7 @@ func VerifikasiSent(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"MESSAGE ": http.StatusNotFound, "Result": "Tidak ada email tersebut"})
 	}*/
 
-	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("verifikasi", "aktif")
+	err1 := model.DB.Model(&u).Where("email= ?", uID).Update("verifikasi", "Ya")
 	if err1 != nil {
 		utils.WrapAPIData(c, map[string]interface{}{
 			"Email": uID,
@@ -294,6 +304,15 @@ func GetListUser(c *gin.Context) {
 	}, http.StatusOK, "success")
 }
 
+func GetListUserRej(c *gin.Context) {
+	var usr []model.UserReject
+	res := model.GetLUserRE(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": res,
+	}, http.StatusOK, "success")
+}
+
 func CreateAdmin(c *gin.Context) {
 
 	var account model.Admin
@@ -348,6 +367,8 @@ func AccepAdmin(c *gin.Context) {
 	//fmt.Println(account)
 
 	//q := model.DB.Save(&account)
+
+	//approve akun
 	q := model.DB.Delete(&account1)
 	b := q.RowsAffected
 
@@ -358,15 +379,106 @@ func AccepAdmin(c *gin.Context) {
 
 }
 
-//POST
-func GetListPost(c *gin.Context) {
-	var usr []model.Posting
+func RejectAd(c *gin.Context) {
+	var account1 []model.UserTemporary
+	//var account2 []model.UserReject
 
-	res := model.GetAllPost(usr)
+	if err := c.Bind(&account1); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//reject akkun
+	q2 := model.DB.Model(model.UserReject{}).Create(&account1)
+	br := q2.RowsAffected
+
+	//hapus dari tabel sementara
+	//q :=
+	model.DB.Delete(&account1)
+	//b := q.RowsAffected
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		"Data": res,
+		"Data":         account1,
+		"Row affected": br,
 	}, http.StatusOK, "success")
+}
+
+func RejectoApprov(c *gin.Context) {
+	//var account1 []model.UserTemporary
+	var account2 []model.UserReject
+
+	if err := c.Bind(&account2); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//reject akkun
+	//q2 := model.DB.Model(model.UserReject{}).Create(&account1)
+	//br := q2.RowsAffected
+
+	//hapus dari tabel reject
+	q := model.DB.Delete(&account2)
+	b := q.RowsAffected
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":         account2,
+		"Row affected": b,
+	}, http.StatusOK, "success")
+}
+
+func GetAllListPost(c *gin.Context) {
+	//var usr []model.Posting
+	var usr1 []model.Posting
+
+	//q := model.DB.Preload("Comment").Find(&usr1)
+	model.DB.Preload(clause.Associations).Find(&usr1)
+	/*rows, err := q.Rows()
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&usr1)
+		if err != nil {
+			utils.WrapAPIData(c, map[string]interface{}{
+				"Data": err,
+			}, http.StatusOK, "success")
+		}
+		fmt.Println(&usr1)
+		usr = append(usr, usr1)
+	}*/
+
+	//fmt.Println(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": usr1,
+	}, http.StatusOK, "success")
+
+}
+
+//POSTING
+func GetListPost(c *gin.Context) {
+	//var usr []model.Posting
+	var usr1 model.Posting
+
+	//q := model.DB.Preload("Comment").Find(&usr1)
+	model.DB.Preload("Comment").Find(&usr1)
+	/*rows, err := q.Rows()
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&usr1)
+		if err != nil {
+			utils.WrapAPIData(c, map[string]interface{}{
+				"Data": err,
+			}, http.StatusOK, "success")
+		}
+		fmt.Println(&usr1)
+		usr = append(usr, usr1)
+	}*/
+
+	//fmt.Println(usr)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": usr1,
+	}, http.StatusOK, "success")
+
 }
 
 func InserPost(c *gin.Context) {
