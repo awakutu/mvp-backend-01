@@ -430,22 +430,7 @@ func GetAllListPost(c *gin.Context) {
 	//var usr []model.Posting
 	var usr1 []model.Posting
 
-	//q := model.DB.Preload("Comment").Find(&usr1)
 	model.DB.Preload(clause.Associations).Find(&usr1)
-	/*rows, err := q.Rows()
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(&usr1)
-		if err != nil {
-			utils.WrapAPIData(c, map[string]interface{}{
-				"Data": err,
-			}, http.StatusOK, "success")
-		}
-		fmt.Println(&usr1)
-		usr = append(usr, usr1)
-	}*/
-
-	//fmt.Println(usr)
 
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": usr1,
