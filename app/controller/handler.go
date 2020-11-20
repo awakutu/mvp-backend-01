@@ -862,3 +862,21 @@ func FilterTampilAllwKatUser(c *gin.Context) {
 		"Data": Post,
 	}, http.StatusOK, "success")
 }
+
+func Tampilkanlistkategoriuser(c *gin.Context) {
+	var kategori []model.Detail_category
+	//var
+	var usr model.User
+
+	var parm string
+	parm = c.Param("username") //idpostting
+	param_tempry, err := strconv.Atoi(parm)
+	fmt.Println(err)
+
+	model.DB.Where("username = ?", param_tempry).Find(&usr)
+	model.DB.Where("id_u= ?", usr.ID).Find(&kategori)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": kategori,
+	}, http.StatusOK, "success")
+}

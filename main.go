@@ -93,6 +93,8 @@ func main() {
 	router.POST("/api/comment/:id", middleware.Auth, controller.InsertComment)    //masukkan komentar
 
 	//filter tampilan
+
+	router.GET("/api/dashboard/list/:username", middleware.Auth, controller.Tampilkanlistkategoriuser)
 	router.POST("/api/dashboard/sort1/:jenis_kategori", middleware.Auth, controller.FilterTampilJenisKat)
 	router.POST("/api/dashboard/sort2/:jenisposting", middleware.Auth, controller.FilterTampilAllwTypost)
 
