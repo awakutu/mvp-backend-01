@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"CoCreate/app/utils"
@@ -86,11 +85,6 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
-type Kategori struct {
-	ID            int    `gorm:"primary_key";auto_increment;not_null json:"-"`
-	Nama_kategori string `json:"jenis_kategori"`
-}
-
 type Detail_category struct {
 	IDU           int    `json:"id_user"`
 	IDK           int    `json:"id_kategori"`
@@ -103,38 +97,42 @@ type Admin struct {
 	Password string `json:"password"`
 }
 
+type Kategori struct {
+	ID            int    `gorm:"primary_key";auto_increment;not_null json:"ID"`
+	Nama_kategori string `json:"jenis_kategori"`
+}
+
+//Dislike   int        `gorm:"column:dislike" json:"Dislike"`
+//Kategores []Kategores `gorm:"foreignkey:ID_posting1;association_foreignKey:id";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"jenis_kategori"`
 type Posting struct {
 	ID        int        `gorm:"column:id";auto_increment;not_null json:"id_post"`
+	Foto      string     `gorm:"column:foto"  json:"foto"`
 	Title     string     `gorm:"column:title" json:"title"`
 	Deskripsi string     `gorm:"column:deskripsi" json:"deskripsi"`
 	Like      int        `gorm:"column:like" json:"like"`
 	Share_pos string     `gorm:"column:share_pos" json:"share_pos"`
 	Tgl_pos   *time.Time `gorm:"column:tgl_pos" json:"tgl_pos"`
 	Username  string     `gorm:"column:username" json:"username"`
-	Comment   []Comment  `gorm:"ForeignKey:ID_posting;association_foreignKey:id"; json:"isi`
+	Typep     string     `gorm:"column:typep" json:"type_post"`
+	Kategorip string     `gorm:"column:kategorip" json:"kategori"`
+	View      int        `gorm:"column:view" json:"view"`
+	Comment   []Comment  `gorm:"ForeignKey:ID_posting;association_foreignKey:id";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"isi"`
 }
 
+//`gorm:"ForeignKey:ID_posting1;refrences:id json:"jenis_kategori"`
 type Comment struct {
 	ID         int        `gorm:"column:id";auto_increment;not_null json:"id_comment"`
 	Isi_co     string     `gorm:"column:isi_co" json:"isi"`
 	Tgl_co     *time.Time `gorm:"column:tgl_co" json:"tgl_pos"`
 	Username   string     `gorm:"column:username" json:"username"`
 	ID_posting int        `gorm:"column:id_posting" json:"id_post"`
-	//`gorm:"column:id_post" json:"id_post"`
 }
 
-/*type Artikel struct {
-	ID       int        `gorm:"column:id" json:"artikel_id"`
-	Title    string     `gorm:"column:title" json:"title"`
-	Kontent  string     `gorm:"column:kontent" json:"kontent"`
-	Komentar []Komentar `gorm:"Foreignkey:Artikel_ID;association_foreignkey:ID;" json:"komentar"`
+type Kategores struct {
+	ID1           int    `gorm:"column:id";"primary_key";auto_increment;not_null json:"id1"`
+	ID_posting1   int    `gorm:"column:id_posting1" json:"id_post"`
+	Nama_kategori string `gorm:"column:nama_kategori" json:"jenis_kategori"`
 }
-
-type Komentar struct {
-	ID         int    `gorm:"column:id" json:"komentar_id"`
-	Artikel_ID string `gorm:"column:artikel_id" json:"artikel_id"`
-	Komentar   string `gorm:"column:komentar" json:"komentar"`
-}*/
 
 func checkMail(user User) (bool, error) {
 	err := DB.Where(&User{Email: user.Email}).First(&user)
@@ -159,7 +157,6 @@ func Login(auth Auth) (bool, error, string) {
 			return false, errors.Errorf("Account not found"), ""
 		}
 	}
-
 	err := utils.HashComparator([]byte(account.Password), []byte(auth.Password))
 	if err != nil {
 		return false, errors.Errorf("Incorrect Password"), ""
@@ -197,7 +194,7 @@ func InsertNewAccountTemp(account UserTemporary) (bool, error) {
 //get list kategori
 func GetKateogi(kat []Kategori) []Kategori {
 	DB.Find(&kat)
-	fmt.Println(kat)
+	//fmt.Println(kat)
 	return kat
 }
 
@@ -239,14 +236,14 @@ func LoginAdmin(auth Auth) (bool, error, string) {
 //admin melihat list user approve
 func GetLUser(ul []UserTemporary) []UserTemporary {
 	DB.Find(&ul)
-	fmt.Println(ul)
+	//fmt.Println(ul)
 	return ul
 }
 
 //admin melihat list user reject
 func GetLUserRE(ul []UserReject) []UserReject {
 	DB.Find(&ul)
-	fmt.Println(ul)
+	//fmt.Println(ul)
 	return ul
 }
 
@@ -266,7 +263,7 @@ func Detailpost(post Posting) (bool, error) {
 
 func GetAllPost(post []Posting) []Posting {
 	DB.Find(&post)
-	fmt.Println(post)
+	//fmt.Println(post)
 	return post
 }
 
@@ -277,7 +274,7 @@ func InsertPost(pos Posting) (bool, error) {
 	return true, nil
 }
 
-func InsertCom(com Comment) (bool, error) {
+func InsertCommentm(com Comment) (bool, error) {
 	if err := DB.Create(&com).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
@@ -286,6 +283,6 @@ func InsertCom(com Comment) (bool, error) {
 
 func GetAllComPost(com []Comment) []Comment {
 	DB.Find(&com)
-	fmt.Println(com)
+	//fmt.Println(com)
 	return com
 }

@@ -62,16 +62,6 @@ func getLoginURL(state string) string {
 }
 
 func init() {
-	/*file, err := ioutil.ReadFile("./creds.json")
-	if err != nil {
-		log.Printf("File error: %v\n", err)
-		os.Exit(1)
-	}
-	if err := json.Unmarshal(file, &cred); err != nil {
-		log.Println("unable to marshal data")
-		return
-	}*/
-
 	conf = &oauth2.Config{
 		ClientID:     "913465578188-hai5duusvj9f2h6fv8do8hp79tkpqi5q.apps.googleusercontent.com",
 		ClientSecret: "_hD3IHRGZEd2Bg5ICe4CWm7W",
@@ -80,7 +70,6 @@ func init() {
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
-			//"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=accessToken",
 		},
 		Endpoint: google.Endpoint,
 	}
@@ -117,7 +106,8 @@ func AuthHandler(c *gin.Context) {
 	}
 	defer userinfo.Body.Close()
 	data, _ := ioutil.ReadAll(userinfo.Body)
-	datatoken, _ := ioutil.ReadAll(response.Body)
+	//datatoken, _ :=
+	ioutil.ReadAll(response.Body)
 	//u := structs.User{}
 	var u UserGoogle
 	if err = json.Unmarshal(data, &u); err != nil {
@@ -130,7 +120,6 @@ func AuthHandler(c *gin.Context) {
 	err = session.Save()
 	if err != nil {
 		log.Println(err)
-		//		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{"message": "Error while saving session. Please try again."})
 		c.JSON(http.StatusBadRequest, gin.H{"MESSAGE ": http.StatusBadRequest, "Result": "Bad Request"})
 		return
 	}
@@ -139,21 +128,26 @@ func AuthHandler(c *gin.Context) {
 	fmt.Println(&u)
 	var account model.User
 	var accountT model.UserTemporary
+	var accountR model.UserReject
 
 	account.Email = u.Email
 	accountT.Email = u.Email
+	accountR.Email = u.Email
 
 	account.Nama = u.Name
+	accountT.Nama = u.Name
 	accountT.Nama = u.Name
 
 	account.Status = "Aktif"
 
 	account.Username = u.Name
 	accountT.Username = u.Name
+	accountR.Username = u.Name
 	//account.Status = "Tidak Aktif"
 
 	account.Password = ""
 	accountT.Password = ""
+	accountR.Password = ""
 
 	pass, err := utils.HashGenerator(account.Password)
 	if err != nil {
@@ -162,43 +156,29 @@ func AuthHandler(c *gin.Context) {
 	}
 	account.Password = pass
 	accountT.Password = pass
+	accountR.Password = pass
 
-	//expirationTime := time.Now().Add(30 * time.Minute)
-
-	//json.NewDecoder(userinfo.Body).Decode(&creds)
 	claims := &Claims{
 		Username:       u.Name,
 		Password:       account.Password,
-		StandardClaims: jwt.StandardClaims{
-			// In JWT, the expiry time is expressed as unix milliseconds
-			//ExpiresAt: expirationTime.Unix(),
-		},
+		StandardClaims: jwt.StandardClaims{},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Create the JWT string
-	tokenString, err := token.SignedString(jwtKey)
+
+	//tokenString, err :=
+	token.SignedString(jwtKey)
 	if err != nil {
-		// If there is an error in creating the JWT return an internal server error
 		c.JSON(http.StatusOK, gin.H{"eror": err})
 		return
 	}
 
 	e := model.DB.Where("email=?", u.Email).First(&account)
-	if e.RowsAffected == 0 {
-		c.JSON(http.StatusOK, gin.H{"status check email": "ok"})
-	} else {
-		utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK)
+	if e.RowsAffected == 1 {
+		utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK) //c.JSON(http.StatusOK, gin.H{"status check email": "ok"})
 	}
 
-	//b2 := err.RowsAffected
-	//if b2 == 1 {
-	//	utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK)
-	//	return
-	//}
-
-	//model.DB.Create(account)
-	//model.DB.Create(accountT)
 	if err := model.DB.Create(&account).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"eror": err})
 	}
@@ -207,10 +187,17 @@ func AuthHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"eror": err})
 	}
 
+	if err := model.DB.Create(&accountR).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"eror": err})
+	}
 	model.DB.Where("email= ?", u.Email).Delete(&accountT)
 
-	c.JSON(http.StatusOK, gin.H{"Status": "berhasil", "Data": u, "token google": datatoken, "token JWT Generate": tokenString})
+	model.DB.Where("email= ?", u.Email).Delete(&accountR)
+
+	//c.JSON(http.StatusOK, gin.H{"Status": "berhasil", "Data": u, "token google": datatoken, "token JWT Generate": tokenString})
 	//c.Redirect(http.StatusTemporaryRedirect, "http://localhost:8084/api/pref/"+u.Name)
+
+	c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000/Login")
 }
 
 func LoginHandler(ctx *gin.Context) {
