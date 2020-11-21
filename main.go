@@ -108,6 +108,10 @@ func main() {
 	//router.POST("/api/commentd", middleware.Auth, controller.DeleteComment)
 	//router.POST("/api/commentu", middleware.Auth, controller.UpdateComment)
 
+	//trending
+	router.GET("/api/dashboard/trending_artikel", middleware.Auth, controller.TrendingArtikel)
+	router.GET("/api/dashboard/trending_membership", middleware.Auth, controller.TrendingMembership)
+
 	router.Run(":8084") //port server utama
 	//port server sign in google // router.Run(":8085")
 }

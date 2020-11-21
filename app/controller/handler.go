@@ -249,7 +249,7 @@ func VerifikasiSent(c *gin.Context) {
 		/*utils.WrapAPIData(c, map[string]interface{}{
 			"Email": uID,
 		}, http.StatusOK, "success")*/
-		c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000/Login")
+		c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000/Verified")
 		return
 	} else {
 		utils.WrapAPIError(c, "err1.Error()", http.StatusBadRequest)
@@ -878,5 +878,35 @@ func Tampilkanlistkategoriuser(c *gin.Context) {
 
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": kategori,
+	}, http.StatusOK, "success")
+}
+
+type Trending_membership struct {
+	Username string `json:"username"`
+	Trending int    `json:"trending_membership"`
+}
+
+func TrendingMembership(c *gin.Context) {
+	var trending_membership []Trending_membership
+
+	model.DB.Raw("Select username, count(username) as trending from postings group by username order by trending desc limit 3").Scan(&trending_membership)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": trending_membership,
+	}, http.StatusOK, "success")
+}
+
+type Trending_artikel struct {
+	Title    string `json:"title"`
+	Trending int    `json:"trending_artikel"`
+}
+
+func TrendingArtikel(c *gin.Context) {
+	var trending_artikel []Trending_artikel
+
+	model.DB.Raw("Select title, max(view) as trending from postings group by title order by trending desc limit 3").Scan(&trending_artikel)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": trending_artikel,
 	}, http.StatusOK, "success")
 }
