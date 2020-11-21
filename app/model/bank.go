@@ -15,6 +15,11 @@ const (
 	layoutDateTime = "2006-01-02 15:04:05"
 )
 
+type Foto struct {
+	Username string `json:"username"`
+	Value    string `json:"value"`
+}
+
 type Goguser struct {
 	ID          string `json:"id"`
 	DisplayName string `json:"displayName"`
@@ -51,7 +56,7 @@ type User struct {
 	Email      string `json:"email"`
 	Phone      string `json:"phone"`
 	Ttl        string `json:"ttl"`
-	Foto       []byte `json:"foto"`
+	Foto       string `json:"foto"`
 	Status     string `json:"status"`
 	Verifikasi string `json:"verifikasi"`
 }
@@ -64,7 +69,7 @@ type UserTemporary struct {
 	Email      string `json:"email"`
 	Phone      string `json:"phone"`
 	Ttl        string `json:"ttl"`
-	Foto       []byte `json:"foto"`
+	Foto       string `json:"foto"`
 	Status     string `json:"status"`
 	Verifikasi string `json:"verifikasi"`
 }
@@ -77,7 +82,7 @@ type UserReject struct {
 	Email      string `json:"email"`
 	Phone      string `json:"phone"`
 	Ttl        string `json:"ttl"`
-	Foto       []byte `json:"foto"`
+	Foto       string `json:"foto"`
 	Status     string `json:"status"`
 	Verifikasi string `json:"verifikasi"`
 }

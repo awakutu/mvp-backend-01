@@ -926,20 +926,6 @@ func InsertProject(c *gin.Context) {
 	pro.Tgl_edit = &now
 
 	pro.SumAnggota = 1
-
-	/*flag, err := model.InsertProj(pro)
-
-	fmt.Println(pro)
-	if flag {
-		utils.WrapAPIData(c, map[string]interface{}{
-			"Data": pro,
-		}, http.StatusOK, "success")
-		return
-	} else {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}*/
-
 	model.InsertProj(pro)
 
 	model.DB.Model(&pro).Where("title=?", pro.Title).Scan(&pro1)
@@ -952,21 +938,8 @@ func InsertProject(c *gin.Context) {
 	grup1.Date_join = &now
 	grup1.IDU = pro.IDU
 	grup1.Username = pro.Username
-	//grup1.IDP = pro.ID
 	grup1.Projectname = pro.Title
 
-	/*pass, err := model.InsertGrupProj(grup1)
-
-	fmt.Println(grup1)
-	if pass {
-		utils.WrapAPIData(c, map[string]interface{}{
-			"role": grup1.Role,
-		}, http.StatusOK, "success")
-		return
-	} else {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}*/
 	model.InsertGrupProj(grup1)
 
 	utils.WrapAPIData(c, map[string]interface{}{

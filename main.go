@@ -133,6 +133,12 @@ func main() {
 	//soon update status task
 	// soon lihat by status
 
+	router.POST("/api/upload/profil/:username", controller.TerimaUploadJPGFoto)
+	router.GET("/api/get/profil/:username", controller.GetProfilJPGtobase64)
+
+	//router.POST("/api/upload/posting", controller.gET)
+	//router.GET("/api/get/postin/:username", controller.GetProfilJPGtobase64)
+
 	router.Run(":8084") //port server utama
 	//port server sign in google // router.Run(":8085")
 }
