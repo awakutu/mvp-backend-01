@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"CoCreate/app/utils"
@@ -132,6 +133,48 @@ type Kategores struct {
 	ID1           int    `gorm:"column:id";"primary_key";auto_increment;not_null json:"id1"`
 	ID_posting1   int    `gorm:"column:id_posting1" json:"id_post"`
 	Nama_kategori string `gorm:"column:nama_kategori" json:"jenis_kategori"`
+}
+
+type Project struct {
+	ID          int           `gorm:"column:id";auto_increment;not_null json:"id_project"`
+	Title       string        `json:"title"`
+	Deskripsi   string        `json:"deskripsi"`
+	Tgl_pos     *time.Time    `json:"tgl_pos"`
+	Tgl_edit    *time.Time    `json:"tgl_edit"`
+	IDU         int           `json:"id_user"`
+	Username    string        `json:"username"`
+	SumAnggota  int           `json:"sum_anggota"`
+	GrupProject []GrupProject `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"grup_projects"`
+}
+
+type GrupProject struct {
+	ID          int        `gorm:"column:id";auto_increment;not_null json:"id_grup"`
+	Role        string     `json:"role"`
+	Date_join   *time.Time `json:"date_join"`
+	Date_left   *time.Time `json:"date_left"`
+	IDU         int        `json:"id_user"`
+	Username    string     `json:"username"`
+	IDP         int        `json:"id_project"`
+	Projectname string     `json:"projectname"`
+}
+
+type Task struct {
+	ID          int        `gorm:"column:id";auto_increment;not_null json:"id_task"`
+	Judul       string     `json:"judul"`
+	PenJawab    string     `json:"penjawab"`
+	Progress    string     `json:"progress"`
+	Deskripsi   string     `json:"deskripsi"`
+	IDpembuat   int        `json:"id_pembuat"`
+	CreatedBy   string     `json:"createdby"`
+	Tgl_pos     *time.Time `json:"tgl_pos"`
+	Tgl_edit    *time.Time `json:"tgl_edit"`
+	IDP         int        `json:"id_project"`
+	Projectname string     `json:"projectname"`
+}
+
+type ProgressStat struct {
+	ID   int    `gorm:"primary_key";auto_increment;not_null json:"-"`
+	Nama string `json:"nama"`
 }
 
 func checkMail(user User) (bool, error) {
@@ -285,4 +328,37 @@ func GetAllComPost(com []Comment) []Comment {
 	DB.Find(&com)
 	//fmt.Println(com)
 	return com
+}
+
+func InsertProj(proj Project) (bool, error) {
+	if err := DB.Create(&proj).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
+func InsertGrupProj(grup GrupProject) (bool, error) {
+	if err := DB.Create(&grup).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
+func GetProjek(listproj []Project) []Project {
+	DB.Find(&listproj)
+	fmt.Println(listproj)
+	return listproj
+}
+
+func GetAnggota(listanggota []GrupProject) []GrupProject {
+	DB.Find(&listanggota)
+	fmt.Println(listanggota)
+	return listanggota
+}
+
+func InsertTask(task Task) (bool, error) {
+	if err := DB.Create(&task).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
 }

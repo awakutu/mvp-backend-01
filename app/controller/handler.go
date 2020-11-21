@@ -910,3 +910,343 @@ func TrendingArtikel(c *gin.Context) {
 		"Data": trending_artikel,
 	}, http.StatusOK, "success")
 }
+
+func InsertProject(c *gin.Context) {
+	var pro model.Project
+	var pro1 model.Project
+	var grup1 model.GrupProject
+
+	if err := c.Bind(&pro); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	now := time.Now()
+	pro.Tgl_pos = &now
+	pro.Tgl_edit = &now
+
+	pro.SumAnggota = 1
+
+	/*flag, err := model.InsertProj(pro)
+
+	fmt.Println(pro)
+	if flag {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Data": pro,
+		}, http.StatusOK, "success")
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}*/
+
+	model.InsertProj(pro)
+
+	model.DB.Model(&pro).Where("title=?", pro.Title).Scan(&pro1)
+
+	grup1.IDP = pro1.ID
+
+	fmt.Println(pro1.ID) //lihat nilai pro id  //nah save baru run mba //oke  //sdh bisa????? //SUUUDAHHHHHH  //oke  //ku out ya //okaayyy
+
+	grup1.Role = "admin"
+	grup1.Date_join = &now
+	grup1.IDU = pro.IDU
+	grup1.Username = pro.Username
+	//grup1.IDP = pro.ID
+	grup1.Projectname = pro.Title
+
+	/*pass, err := model.InsertGrupProj(grup1)
+
+	fmt.Println(grup1)
+	if pass {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"role": grup1.Role,
+		}, http.StatusOK, "success")
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}*/
+	model.InsertGrupProj(grup1)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"role":                      grup1.Role,
+		"Data Insert Project":       pro,
+		"Data Insert Group Project": grup1,
+	}, http.StatusOK, "success")
+
+}
+
+type SumGroup struct {
+	SumAnggota int `json:"sum_anggota"`
+}
+
+func InsertGroupProj(c *gin.Context) {
+	var grup model.GrupProject
+	var prj model.Project
+	//ar account model.Admin
+	if err := c.Bind(&grup); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sk := c.Param("id")
+
+	var sg SumGroup
+	model.DB.Where("id=? ", sk).Find(&prj)
+	model.DB.Model(&prj).Where("id= ?", sk).Update("sum_anggota", prj.SumAnggota+1).Scan(&sg)
+
+	now := time.Now()
+	//secs := now.UnixNano()
+	grup.Date_join = &now
+
+	flag, err := model.InsertGrupProj(grup)
+	if flag {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"Data": grup,
+		}, http.StatusOK, "success")
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+//list semua projek + komen
+func GetListProjAll(c *gin.Context) {
+	/* var listproj []model.Project
+
+	res := model.GetProj(listproj)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": res,
+	}, http.StatusOK, "success") */
+
+	var proj1 []model.Project
+
+	model.DB.Preload(clause.Associations).Find(&proj1)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": proj1,
+	}, http.StatusOK, "success")
+
+}
+
+//list projek berdasarkan username
+func GetListProj(c *gin.Context) {
+	//var gp []model.GrupProject
+	//var gp1 model.GrupProject
+	var gp3 []model.Project
+
+	/*if err := c.Bind(&u); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	//log.Println("LOGIN") */
+
+	//di save >> save
+
+	aID := c.Param("username")
+
+	model.DB.Preload("GrupProject", "username", aID).Find(&gp3)
+
+	//model.DB.Raw("Select * from projct group by username order by trending desc limit 3").Scan(&trending_membership)
+
+	//model.DB.Where("grup_projects.username = ?", aID).Preload("GrupProject", "username", aID).Find(&gp3)
+
+	//model.DB.Model(&gp1).Where("username=?", aID).Scan(&gp)
+	//model.DB.Model(&gp).Where("id_project=?", gp.id_project).Scan(&gp3)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Anggota": gp3,
+	}, http.StatusOK, "success")
+}
+
+func GetProj(c *gin.Context) {
+	//var ka []model.Kategori
+	var p model.Project
+
+	pID := c.Param("id")
+
+	model.DB.Where("id=?", pID).Preload(clause.Associations).Find(&p)
+
+	fmt.Println(&pID, p.ID)
+	model.DB.Find(&p)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": p,
+	}, http.StatusOK, "success")
+}
+
+func GetListAnggota(c *gin.Context) {
+	var gp []model.GrupProject
+	var gp1 model.GrupProject
+
+	/*if err := c.Bind(&u); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	//log.Println("LOGIN") */
+
+	aID := c.Param("id")
+
+	model.DB.Model(&gp1).Where("id_p=?", aID).Scan(&gp)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Anggota": gp,
+	}, http.StatusOK, "success")
+}
+
+func UpdateProj(c *gin.Context) {
+	var uproj model.Project
+
+	if err := c.Bind(&uproj); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sk := c.Param("id")
+
+	var sk1 model.Project
+	model.DB.Where("id=?", sk).Find(&sk1)
+
+	fmt.Println(sk1.ID)
+
+	now := time.Now()
+	uproj.Tgl_edit = &now
+
+	result := model.DB.Model(model.Project{}).Where("id = ?", sk1.ID).Updates(uproj)
+	b := result.RowsAffected
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":        &uproj,
+		"Rows_update": b,
+	}, http.StatusOK, "success")
+}
+
+func DeleteProj(c *gin.Context) {
+	var membergrup []model.GrupProject
+	var pro model.Project
+
+	if err := c.Bind(&pro); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	q := model.DB.Where("id=?", pro.ID).Find(&pro)
+	y := model.DB.Where("id_p=? ", pro.ID).Find(&membergrup)
+	model.DB.Delete(&pro)
+	model.DB.Delete(&membergrup) //slh
+	fmt.Println(q)
+	fmt.Println(y)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Project":    pro,
+		"Membergrup": membergrup,
+	}, http.StatusOK, "success")
+}
+
+func DeleteAnggota(c *gin.Context) {
+	var grup model.GrupProject
+	var pro model.Project
+	var sg SumGroup
+
+	if err := c.Bind(&grup); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	q := model.DB.Where("id_p=? AND username=?", grup.IDP, grup.Username).Find(&grup)
+	y := model.DB.Where("id=? ", grup.IDP).Find(&pro)
+	model.DB.Model(&pro).Where("id= ?", grup.IDP).Update("sum_anggota", pro.SumAnggota-1).Scan(&sg)
+	model.DB.Delete(&grup) //slh
+	fmt.Println(q)
+	fmt.Println(y)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Delete": grup,
+		"tes":    sg,
+	}, http.StatusOK, "success")
+}
+
+func InsertTask(c *gin.Context) {
+	var task1 model.Task
+
+	if err := c.Bind(&task1); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	now := time.Now()
+	task1.Tgl_pos = &now
+	task1.Tgl_edit = &now
+
+	model.InsertTask(task1)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"task": task1,
+	}, http.StatusOK, "success")
+
+}
+
+func GetTask(c *gin.Context) {
+	//var ka []model.Kategori
+	var t []model.Task
+	var t1 model.Task
+
+	tID := c.Param("id")
+
+	model.DB.Model(&t1).Where("id_p=?", tID).Scan(&t)
+
+	fmt.Println(&tID, t1.ID)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": t,
+	}, http.StatusOK, "success")
+}
+
+func UpdateTask(c *gin.Context) {
+	var utask model.Task
+
+	if err := c.Bind(&utask); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	tk := c.Param("id")
+
+	var tk1 model.Task
+	model.DB.Where("id=?", tk).Find(&tk1)
+
+	fmt.Println(utask.ID)
+
+	now := time.Now()
+	utask.Tgl_edit = &now
+
+	result := model.DB.Model(model.Task{}).Where("id= ?", tk1.ID).Updates(utask)
+	b := result.RowsAffected
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":        &utask,
+		"Rows_update": b,
+	}, http.StatusOK, "success")
+}
+
+func DeleteTask(c *gin.Context) {
+	var dtask model.Task
+
+	if err := c.Bind(&dtask); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	dt := c.Param("id")
+
+	y := model.DB.Where("id=? ", dt).Find(&dtask)
+	model.DB.Delete(&dtask)
+	fmt.Println(y)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Delete": dtask,
+	}, http.StatusOK, "success")
+}
