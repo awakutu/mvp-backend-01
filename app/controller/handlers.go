@@ -65,8 +65,8 @@ func init() {
 	conf = &oauth2.Config{
 		ClientID:     "913465578188-hai5duusvj9f2h6fv8do8hp79tkpqi5q.apps.googleusercontent.com",
 		ClientSecret: "_hD3IHRGZEd2Bg5ICe4CWm7W",
-		RedirectURL:  "http://kelompok1.dtstakelompok1.com/auth/google/callback",
-		//RedirectURL: "http://localhost:8084/auth",
+		//RedirectURL:  "http://kelompok1.dtstakelompok1.com/auth/google/callback",
+		RedirectURL: "http://localhost:8084/auth",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
@@ -167,8 +167,7 @@ func AuthHandler(c *gin.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Create the JWT string
 
-	//tokenString, err :=
-	token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"eror": err})
 		return
@@ -194,10 +193,22 @@ func AuthHandler(c *gin.Context) {
 
 	model.DB.Where("email= ?", u.Email).Delete(&accountR)
 
-	//c.JSON(http.StatusOK, gin.H{"Status": "berhasil", "Data": u, "token google": datatoken, "token JWT Generate": tokenString})
+	fmt.Println(tokenString)
+	fmt.Println(token)
+	//
 
+	//c.Header("Content-Type", "application/json")
+
+	//c.Request.Write("Authorization:", tokenString)
+	c.Header("Authorization", tokenString)
+	//c.Request.Response.se
+	//c.Writer.Header().Set("Authorization:", tokenString)
+
+	//c.JSON(http.StatusOK, gin.H{"token JWT Generate": tokenString})
+	//c.JSON(http.StatusOK, gin.H{"token google": datatoken, "token JWT Generate": tokenString})
 	//c.Redirect(http.StatusTemporaryRedirect, "http://localhost:8084/api/pref/"+u.Name)
-	c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000/Login")
+
+	c.Redirect(http.StatusPermanentRedirect, "http://localhost:8084/api/pref/farhani")
 }
 
 func LoginHandler(ctx *gin.Context) {

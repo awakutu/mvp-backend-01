@@ -12,13 +12,13 @@ import (
 
 func main() {
 	router := gin.Default()
-	//cfg := cors.DefaultConfig()
-	//cfg.AllowAllOrigins = true
-	//cfg.AllowCredentials = true
-	//cfg.AllowMethods = []string{"GET", "POST"}
-	//cfg.AllowHeaders = []string{"Authorization", "Origin", "Accept", "X-Requested-With", " Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"}
-	//router.Use(cors.New(cfg))
-	router.Use(cors.Default())
+	cfg := cors.DefaultConfig()
+	cfg.AllowAllOrigins = true
+	cfg.AllowCredentials = true
+	cfg.AllowMethods = []string{"GET", "POST"}
+	cfg.AllowHeaders = []string{"Authorization", "Origin", "Accept", "X-Requested-With", " Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"}
+	router.Use(cors.New(cfg))
+	//router.Use(cors.Default())
 
 	token, err := controller.RandToken(64)
 	if err != nil {
@@ -68,7 +68,7 @@ func main() {
 	router.POST("/api/likei/:id", middleware.Auth, controller.IncLike)
 	router.POST("/api/liked/:id", middleware.Auth, controller.DecLike)
 
-	//-----
+	//---------------------------------------------------------------------
 	//router.POST("/api/dislikei/:id", middleware.Auth, controller.DIncLike)
 	//router.POST("/api/disliked/:id", middleware.Auth, controller.DDecLike)
 
@@ -118,22 +118,23 @@ func main() {
 	//soon update status task
 	// soon lihat by status
 
+	//upload foto
 	router.POST("/api/upload/profil/:username", controller.TerimaUploadJPGFoto)
 	router.GET("/api/get/profil/:username", controller.GetProfilJPGtobase64)
 
-	//router.POST("/api/upload/posting", controller.gET)
-	//router.GET("/api/get/postin/:username", controller.GetProfilJPGtobase64)
+	router.POST("/api/upload/posting/:id", controller.TerimaUploadPsotingFoto)
+	router.GET("/api/get/posting/:id", controller.GetPostingJPGtobase64)
 
 	//gogle
 	//---------------------------------------------------------------------
-	router.GET("/auth/google/callback", controller.AuthHandler) //redirect
+	//router.GET("/auth/google/callback", controller.AuthHandler) //redirect
 	router.GET("/google", controller.LoginHandler)
 	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
 
-	//router.GET("/auth", controller.AuthHandler)
+	router.GET("/auth", controller.AuthHandler)
 	//router.GET("/google", controller.LoginHandler) //localhost
+
 	//---------------------------------------------------------------------
 
 	router.Run(":8084") //port server utama
-	//port server sign in google // router.Run(":8085")
 }

@@ -8,8 +8,8 @@ import (
 var DB *gorm.DB
 
 const (
-	MysqlDsn = `user:@tcp(3.15.137.94)/bank?parseTime=True&charset=utf8`
-	//MysqlDsn = `root:@tcp(localhost:3306)/bank?parseTime=True&charset=utf8`
+	MysqlDsn = `user:YbcuGH4Ks@z6$@tcp(3.15.137.94)/bank?parseTime=True&charset=utf8`
+	//MysqlDsn = `root:YbcuGH4Ks@z6$@tcp(localhost:3306)/bank?parseTime=True&charset=utf8`
 )
 
 func init() {
