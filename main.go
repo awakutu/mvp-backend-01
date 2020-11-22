@@ -12,13 +12,13 @@ import (
 
 func main() {
 	router := gin.Default()
-	cfg := cors.DefaultConfig()
-	cfg.AllowAllOrigins = true
-	cfg.AllowCredentials = true
-	cfg.AllowMethods = []string{"GET", "POST"}
-	cfg.AllowHeaders = []string{"Authorization", "Origin", "Accept", "X-Requested-With", " Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"}
-	router.Use(cors.New(cfg))
-	//router.Use(cors.Default())
+	//cfg := cors.DefaultConfig()
+	//cfg.AllowAllOrigins = true
+	//cfg.AllowCredentials = true
+	//cfg.AllowMethods = []string{"GET", "POST"}
+	//cfg.AllowHeaders = []string{"Authorization", "Origin", "Accept", "X-Requested-With", " Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"}
+	//router.Use(cors.New(cfg))
+	router.Use(cors.Default())
 
 	token, err := controller.RandToken(64)
 	if err != nil {
@@ -31,21 +31,6 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(sessions.Sessions("cocreate", store))
-
-	router.GET("/auth/google/callback", controller.AuthHandler) //redirect
-	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
-	router.GET("/google", controller.LoginHandler)
-
-	//router.GET("/auth", controller.AuthHandler)
-	//router.GET("/google", controller.LoginHandler) //localhost
-
-	//-----------------------------------------------------
-
-	//authorized := router.Group("/battle")
-	//authorized.Use(middleware.AuthorizeRequest())
-	//{
-	//	authorized.GET("/field", controller.FieldHandler)
-	//}
 
 	//user
 	//------------------------------------------------------------------
@@ -86,14 +71,13 @@ func main() {
 	//-----
 	//router.POST("/api/dislikei/:id", middleware.Auth, controller.DIncLike)
 	//router.POST("/api/disliked/:id", middleware.Auth, controller.DDecLike)
+
 	//comment
 	//---------------------------------------------------------------------
-
 	router.POST("/api/posting/:id", middleware.Auth, controller.GetListComInPost) //detail posting
 	router.POST("/api/comment/:id", middleware.Auth, controller.InsertComment)    //masukkan komentar
 
 	//filter tampilan
-
 	router.GET("/api/dashboard/list/:username", middleware.Auth, controller.Tampilkanlistkategoriuser)
 	router.POST("/api/dashboard/sort1/:jenis_kategori", middleware.Auth, controller.FilterTampilJenisKat)
 	router.POST("/api/dashboard/sort2/:jenisposting", middleware.Auth, controller.FilterTampilAllwTypost)
@@ -109,6 +93,7 @@ func main() {
 	//router.POST("/api/commentu", middleware.Auth, controller.UpdateComment)
 
 	//trending
+	//---------------------------------------------------------------------
 	router.GET("/api/dashboard/trending_artikel", middleware.Auth, controller.TrendingArtikel)
 	router.GET("/api/dashboard/trending_membership", middleware.Auth, controller.TrendingMembership)
 
@@ -138,6 +123,16 @@ func main() {
 
 	//router.POST("/api/upload/posting", controller.gET)
 	//router.GET("/api/get/postin/:username", controller.GetProfilJPGtobase64)
+
+	//gogle
+	//---------------------------------------------------------------------
+	router.GET("/auth/google/callback", controller.AuthHandler) //redirect
+	router.GET("/google", controller.LoginHandler)
+	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
+
+	//router.GET("/auth", controller.AuthHandler)
+	//router.GET("/google", controller.LoginHandler) //localhost
+	//---------------------------------------------------------------------
 
 	router.Run(":8084") //port server utama
 	//port server sign in google // router.Run(":8085")

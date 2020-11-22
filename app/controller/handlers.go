@@ -195,8 +195,8 @@ func AuthHandler(c *gin.Context) {
 	model.DB.Where("email= ?", u.Email).Delete(&accountR)
 
 	//c.JSON(http.StatusOK, gin.H{"Status": "berhasil", "Data": u, "token google": datatoken, "token JWT Generate": tokenString})
-	//c.Redirect(http.StatusTemporaryRedirect, "http://localhost:8084/api/pref/"+u.Name)
 
+	//c.Redirect(http.StatusTemporaryRedirect, "http://localhost:8084/api/pref/"+u.Name)
 	c.Redirect(http.StatusPermanentRedirect, "http://localhost:3000/Login")
 }
 

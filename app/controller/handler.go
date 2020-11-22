@@ -556,6 +556,16 @@ func DecLike(c *gin.Context) {
 	}
 }
 
+/*func SharingPostingan(c *gin.Context) {
+	var post model.Posting
+
+
+	if err := c.Bind(&post.); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+}*/
+
 //funct insert comment
 func InsertComment(c *gin.Context) {
 	var co model.Comment
@@ -1021,8 +1031,9 @@ func GetListProj(c *gin.Context) {
 
 	aID := c.Param("username")
 
-	model.DB.Preload("GrupProject", "username", aID).Find(&gp3)
+	//model.DB.Where("username = ?", aID).Preload("GrupProject", "username", aID).Find(&gp3)
 
+	model.DB.Preload("GrupProject", "username", aID).Find(&gp3)
 	//model.DB.Raw("Select * from projct group by username order by trending desc limit 3").Scan(&trending_membership)
 
 	//model.DB.Where("grup_projects.username = ?", aID).Preload("GrupProject", "username", aID).Find(&gp3)

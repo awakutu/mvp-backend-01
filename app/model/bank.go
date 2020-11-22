@@ -149,7 +149,7 @@ type Project struct {
 	IDU         int           `json:"id_user"`
 	Username    string        `json:"username"`
 	SumAnggota  int           `json:"sum_anggota"`
-	GrupProject []GrupProject `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"grup_projects"`
+	GrupProject []GrupProject `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"projectname"`
 }
 
 type GrupProject struct {
@@ -180,6 +180,30 @@ type Task struct {
 type ProgressStat struct {
 	ID   int    `gorm:"primary_key";auto_increment;not_null json:"-"`
 	Nama string `json:"nama"`
+}
+
+//SQL QUery kira2 : SELECT Users.username, Users.Email, Username.Phone, Username.TTL
+
+type Portofolio struct {
+	ID        int         `gorm:"primary_key"; json:"ID"`
+	Username  string      `json:"username"`
+	Exprience []Exprience `gorm:"many2many:Exprience"`
+	Expertise []Expertise `gorm:"many2many:Expertise"`
+	Posting   []Posting   `gorm:"many2many:Posting"`
+}
+
+type Exprience struct {
+	ID           int    `gorm:"primary_key"; json:"ID"`
+	IDportofolio int    `json:"idportofolio"`
+	Username     string `json:"username"`
+	Value        string `json:"value"`
+}
+
+type Expertise struct {
+	ID           int    `gorm:"primary_key"; json:"ID"`
+	IDportofolio int    `json:"idportofolio"`
+	Username     string `json:"username"`
+	Value        string `json:"value"`
 }
 
 func checkMail(user User) (bool, error) {
