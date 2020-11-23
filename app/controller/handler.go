@@ -1284,6 +1284,7 @@ type CheckPortofolios struct {
 func GetPortofolio(c *gin.Context) {
 
 	var portofolio model.Portofolio
+	var postingan []model.Posting
 	//var exprience model.Exprience
 	//var expertise model.Expertise
 	var user model.User
@@ -1308,9 +1309,10 @@ func GetPortofolio(c *gin.Context) {
 	model.DB.Preload(clause.Associations).Where("username=?", parm).Find(&portofolio)
 	//model.DB.Where("username=?", parm)
 
-	//model.DB.Where()
+	model.DB.Where("username=?", parm).Find(&postingan)
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Portofolio": portofolio,
+		"Postingan":  postingan,
 	}, http.StatusOK, "success")
 }
 
@@ -1462,4 +1464,51 @@ func UpdateExpertise(c *gin.Context) {
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": expertise,
 	}, http.StatusOK, "success")
+}
+
+type Accountgoogle struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
+func AuthLoginGoogle(c *gin.Context) {
+	var auth model.Auth
+	var account1 model.User
+	var accountgoogle Accountgoogle
+	//var account model.Us
+
+	if err := c.Bind(&accountgoogle); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	auth.Username = accountgoogle.Name
+	auth.Password = ""
+
+	checkemail := model.DB.Where("username=?", auth.Username).First(&account1)
+	b2 := checkemail.RowsAffected
+	if b2 == 1 {
+		utils.WrapAPIError(c, "Email sudah ada", http.StatusOK)
+		return
+	}
+
+	account1.Password = ""
+	account1.Username = accountgoogle.Name
+	account1.Email = accountgoogle.Email
+
+	model.DB.Where("username=?", auth.Username).First(&account1)
+	b3 := checkemail.RowsAffected
+	if b3 == 0 {
+		model.InsertNewAccount(account1)
+	}
+	flag, err, token := model.Login(auth)
+	if flag {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"token":    token,
+			"username": auth.Username,
+			"ID":       account1.ID,
+		}, http.StatusOK, "success")
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+	}
 }

@@ -203,7 +203,9 @@ type Portofolio struct {
 	Username  string      `json:"username"`
 	Exprience []Exprience `gorm:"ForeignKey:IDportofolio;association_foreignKey:id";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"exprience"`
 	Expertise []Expertise `gorm:"ForeignKey:IDportofolio2;association_foreignKey:id2";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"expertise"`
+	Posting   []Posting   `gorm:"ForeignKey:Username;association_foreignKey:id3";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"title`
 }
+
 type Exprience struct {
 	ID              int    `gorm:"primary_key"; json:"ID"`
 	IDportofolio    int    `json:"idportofolio"`

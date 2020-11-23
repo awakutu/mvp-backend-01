@@ -65,8 +65,8 @@ func init() {
 	conf = &oauth2.Config{
 		ClientID:     "913465578188-hai5duusvj9f2h6fv8do8hp79tkpqi5q.apps.googleusercontent.com",
 		ClientSecret: "_hD3IHRGZEd2Bg5ICe4CWm7W",
-		//RedirectURL:  "http://kelompok1.dtstakelompok1.com/auth/google/callback",
-		RedirectURL: "http://localhost:8084/auth",
+		RedirectURL:  "http://kelompok1.dtstakelompok1.com/auth/google/callback",
+		//RedirectURL: "http://localhost:8084/auth",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in

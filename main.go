@@ -37,13 +37,13 @@ func main() {
 
 	router.POST("/api/register", controller.CreateAccount)
 	router.POST("/api/login", controller.Login)
+	router.POST("/api/loginGoogle", controller.AuthLoginGoogle)
 	router.POST("/api/verifikasi", controller.Verifikasi)
 	router.GET("/api/verifikasi/:email", controller.VerifikasiSent)
 	router.GET("/api/pref/:username", middleware.Auth, controller.GetKategori)
 	router.POST("/api/prefInsert", middleware.Auth, controller.CreateUserKag)
 	router.GET("/api/profile/:username", middleware.Auth, controller.GetProfil)
 	router.POST("/api/profile/:username/update", middleware.Auth, controller.UpdateProfil)
-	router.POST("/api/insertGDB")
 
 	//admin
 	//------------------------------------------------------------------
@@ -140,9 +140,9 @@ func main() {
 	//gogle
 	//---------------------------------------------------------------------
 	//router.GET("/auth/google/callback", controller.AuthHandler) //redirect
-	router.GET("/google", middleware.Auth, controller.LoginHandler)
-	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
-	router.GET("/auth", middleware.Auth, controller.AuthHandler)
+	//router.GET("/google", controller.LoginHandler)
+	router.GET("/auth/google/callback", controller.LoginHandler) //aws
+	router.GET("/auth", controller.AuthHandler)
 	//router.GET("/google", controller.LoginHandler) //localhost
 
 	//portofolio
