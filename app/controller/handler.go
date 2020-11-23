@@ -1049,8 +1049,25 @@ func GetListProj(c *gin.Context) {
 func GetProj(c *gin.Context) {
 	//var ka []model.Kategori
 	var p model.Project
+	var acc model.User
+	var gp model.GrupProject
+
+	if err := c.Bind(&acc); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	pID := c.Param("id")
+
+	log.Println(acc.Username)
+
+	q := model.DB.Where("username = ? and id_p = ?", acc.Username, pID).First(&gp)
+	b := q.RowsAffected
+	if b == 0 {
+		utils.WrapAPIError(c, "Anda Belum tergabung dalam project ini", http.StatusOK)
+		return
+	}
+	log.Println(b)
 
 	model.DB.Where("id=?", pID).Preload(clause.Associations).Find(&p)
 
@@ -1058,7 +1075,8 @@ func GetProj(c *gin.Context) {
 	model.DB.Find(&p)
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		"Data": p,
+		"username": acc.Username,
+		"Data":     p,
 	}, http.StatusOK, "success")
 }
 

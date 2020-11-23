@@ -105,7 +105,7 @@ func main() {
 	router.GET("/api/project/list/:username", middleware.Auth, controller.GetListProj) //Apinya salah soon updated
 	router.POST("/api/project/update", middleware.Auth, controller.UpdateProj)         //edit suatu projek tertentu (id = id_projek)
 	router.POST("/api/project/delete", middleware.Auth, controller.DeleteProj)         //delete suatu projek , akan di update besok routnya
-	router.GET("/api/project/detail/:id", middleware.Auth, controller.GetProj)         // dapatkan detail projek dg id project tertentu
+	router.POST("/api/project/detail/:id", middleware.Auth, controller.GetProj)        // dapatkan detail projek dg id project tertentu
 
 	router.POST("/api/project/groupinsert/:id", middleware.Auth, controller.InsertGroupProj) //masukkan anggota ke dalam grup projek (id=idprojek)
 	router.GET("/api/project/groupanggota/:id", middleware.Auth, controller.GetListAnggota)  //Dapatkan list semua anggota dari satu proyek (id=idprojek)

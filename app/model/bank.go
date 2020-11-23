@@ -237,6 +237,14 @@ func checkUsername(user User) (bool, error) {
 	return true, nil
 }
 
+func checkAnggota(angg GrupProject) (bool, error) {
+	err := DB.Where(&GrupProject{ID: angg.ID}).First(&angg)
+	if err.RowsAffected == 1 {
+		return false, errors.Errorf("Anda Tidak terdaftar sebagai anggota")
+	}
+	return true, nil
+}
+
 func Login(auth Auth) (bool, error, string) {
 	var account User
 	if err := DB.Where(&User{Username: auth.Username}).First(&account).Error; err != nil {
