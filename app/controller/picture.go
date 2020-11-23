@@ -107,7 +107,7 @@ func GetProfilJPGtobase64(c *gin.Context) {
 
 }
 
-func TerimaUploadPsotingFoto(c *gin.Context) {
+func TerimaUploadPostingFoto(c *gin.Context) {
 	var foto model.Foto
 
 	if err := c.Bind(&foto); err != nil {
@@ -130,7 +130,6 @@ func TerimaUploadPsotingFoto(c *gin.Context) {
 		if errDir != nil {
 			log.Fatal(err)
 		}
-
 	}
 
 	parm := c.Param("id")
@@ -154,18 +153,14 @@ func TerimaUploadPsotingFoto(c *gin.Context) {
 }
 
 func GetPostingJPGtobase64(c *gin.Context) {
-	var foto model.Foto
-	var usr model.User
+	var foto model.FotoPostingan
+	var post model.Posting
 
 	parm := c.Param("id")
 
 	fileName := "image/upload/posting/" + parm + ".jpg"
 
-	model.DB.Where("id = ?", parm).Find(&usr)
-
-	foto.Username = usr.Nama
-
-	//foto =
+	model.DB.Where("id = ?", parm).Find(&post)
 
 	imgFile, err := os.Open(fileName)
 
@@ -185,15 +180,11 @@ func GetPostingJPGtobase64(c *gin.Context) {
 	fReader := bufio.NewReader(imgFile)
 	fReader.Read(buf)
 
-	foto.Username = parm
-	//
-	//foto.Value = usr.Foto
+	foto.ID = parm
 
 	foto.Value = base64.StdEncoding.EncodeToString(buf)
-	//fmt.Println("Base64 string is:", imgBase64Str)
-	//return imgBase64Str
+
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": foto,
 	}, http.StatusOK, "success")
-
 }

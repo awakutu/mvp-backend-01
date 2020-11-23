@@ -116,23 +116,40 @@ func main() {
 	router.POST("/api/project/task/:id/edit", middleware.Auth, controller.UpdateTask)   //edit task  id = id_task
 	router.POST("/api/project/task/:id/delete", middleware.Auth, controller.DeleteTask) //delete id = id_task
 	//soon update status task
-	// soon lihat by status
+	//soon lihat by status
+
+	//comment di task
+	router.POST("/api/task/:id", middleware.Auth, controller.CommentTask)
+	//router.POST("/api/commentask/:id")
 
 	//upload foto
+	//---------------------------------------------------------------------
 	router.POST("/api/upload/profil/:username", controller.TerimaUploadJPGFoto)
 	router.GET("/api/get/profil/:username", controller.GetProfilJPGtobase64)
 
-	router.POST("/api/upload/posting/:id", controller.TerimaUploadPsotingFoto)
+	//upload foto postingan
+	//---------------------------------------------------------------------
+	router.POST("/api/upload/posting/:id", controller.TerimaUploadPostingFoto)
 	router.GET("/api/get/posting/:id", controller.GetPostingJPGtobase64)
+
+	//share postingan
+	//---------------------------------------------------------------------
+	router.POST("/api/sharepostingan/:id")
+	router.GET("/api/sharepostingan/:id")
 
 	//gogle
 	//---------------------------------------------------------------------
 	//router.GET("/auth/google/callback", controller.AuthHandler) //redirect
 	router.GET("/google", controller.LoginHandler)
 	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
-
 	router.GET("/auth", controller.AuthHandler)
 	//router.GET("/google", controller.LoginHandler) //localhost
+
+	//portofolio
+	//---------------------------------------------------------------------
+	router.GET("/api/portofolio/:username", middleware.Auth, controller.GetPortofolio)
+	router.POST("/api/portofolio/insert/:username", middleware.Auth, controller.InsertPortofolio)
+	router.POST("/api/portofolio/update/:username", middleware.Auth, controller.UpdatePortofolio)
 
 	//---------------------------------------------------------------------
 

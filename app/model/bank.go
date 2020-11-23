@@ -20,6 +20,11 @@ type Foto struct {
 	Value    string `json:"value"`
 }
 
+type FotoPostingan struct {
+	ID    string `json:"id_posting"`
+	Value string `json:"value"`
+}
+
 type Goguser struct {
 	ID          string `json:"id"`
 	DisplayName string `json:"displayName"`
@@ -164,17 +169,26 @@ type GrupProject struct {
 }
 
 type Task struct {
-	ID          int        `gorm:"column:id";auto_increment;not_null json:"id_task"`
-	Judul       string     `json:"judul"`
-	PenJawab    string     `json:"penjawab"`
-	Progress    string     `json:"progress"`
-	Deskripsi   string     `json:"deskripsi"`
-	IDpembuat   int        `json:"id_pembuat"`
-	CreatedBy   string     `json:"createdby"`
-	Tgl_pos     *time.Time `json:"tgl_pos"`
-	Tgl_edit    *time.Time `json:"tgl_edit"`
-	IDP         int        `json:"id_project"`
-	Projectname string     `json:"projectname"`
+	ID          int           `gorm:"column:id";auto_increment;not_null json:"id_task"`
+	Judul       string        `json:"judul"`
+	PenJawab    string        `json:"penjawab"`
+	Progress    string        `json:"progress"`
+	Deskripsi   string        `json:"deskripsi"`
+	IDpembuat   int           `json:"id_pembuat"`
+	CreatedBy   string        `json:"createdby"`
+	Tgl_pos     *time.Time    `json:"tgl_pos"`
+	Tgl_edit    *time.Time    `json:"tgl_edit"`
+	IDP         int           `json:"id_project"`
+	Projectname string        `json:"projectname"`
+	CommentTask []CommentTask `gorm:"ForeignKey:ID_Task;association_foreignKey:id";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"isi"`
+}
+
+type CommentTask struct {
+	ID          int        `gorm:"column:id";auto_increment;not_null json:"id_comment"`
+	Isi_comment string     `gorm:"column:isi_comment" json:"isi"`
+	Tgl_comment *time.Time `gorm:"column:tgl_comment" json:"tgl_pos"`
+	Username    string     `gorm:"column:username" json:"username"`
+	ID_Task     int        `gorm:"column:id_task" json:"id_task"`
 }
 
 type ProgressStat struct {
@@ -185,11 +199,14 @@ type ProgressStat struct {
 //SQL QUery kira2 : SELECT Users.username, Users.Email, Username.Phone, Username.TTL
 
 type Portofolio struct {
-	ID        int         `gorm:"primary_key"; json:"ID"`
-	Username  string      `json:"username"`
-	Exprience []Exprience `gorm:"many2many:Exprience"`
-	Expertise []Expertise `gorm:"many2many:Expertise"`
-	Posting   []Posting   `gorm:"many2many:Posting"`
+	ID                int    `gorm:"primary_key"; json:"ID"`
+	Username          string `json:"username"`
+	Email             string `json:"email"`
+	Phone             string `json:"phone"`
+	ValueExprience    string `json:"exprience"`
+	ValueExpertise    string `json:"expertise"`
+	Tahun_Exprience   string `json:"tahun_Exprience"`
+	Jabatan_Expertise string `json:"jabatan_Expertise"`
 }
 
 type Exprience struct {
@@ -348,6 +365,13 @@ func InsertPost(pos Posting) (bool, error) {
 
 func InsertCommentm(com Comment) (bool, error) {
 	if err := DB.Create(&com).Error; err != nil {
+		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
+	}
+	return true, nil
+}
+
+func InsertCommentTask(commentTask CommentTask) (bool, error) {
+	if err := DB.Create(&commentTask).Error; err != nil {
 		return false, errors.Errorf("invalid prepare statement :%+v\n", err)
 	}
 	return true, nil

@@ -1175,10 +1175,10 @@ func InsertTask(c *gin.Context) {
 
 func GetTask(c *gin.Context) {
 	//var ka []model.Kategori
-	var t []model.Task
-	var t1 model.Task
+	//var t []model.Task
+	//var t1 model.Task
 
-	tID := c.Param("id")
+	/*tID := c.Param("id")
 
 	model.DB.Model(&t1).Where("id_p=?", tID).Scan(&t)
 
@@ -1186,6 +1186,20 @@ func GetTask(c *gin.Context) {
 
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": t,
+	}, http.StatusOK, "success")*/
+
+	var t1 []model.Task
+
+	parm := c.Param(":id")
+
+	model.DB.Where("id=? ", parm).Find(&t1)
+
+	//model.DB.Model(&t1).Where("id= ?", parm).Update("view", Post.View+1).Scan(&viewrespon)
+
+	model.DB.Preload("CommentTask").Find(&t1)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": t1,
 	}, http.StatusOK, "success")
 }
 
@@ -1232,5 +1246,111 @@ func DeleteTask(c *gin.Context) {
 
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Delete": dtask,
+	}, http.StatusOK, "success")
+}
+
+func CommentTask(c *gin.Context) {
+	var commentTask model.CommentTask
+
+	if err := c.Bind(&commentTask); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var parm string
+	parm = c.Param("id") //idpostting
+
+	now := time.Now()
+	commentTask.Tgl_comment = &now
+	parm2, err := strconv.Atoi(parm)
+	commentTask.ID_Task = parm2
+
+	flag, err := model.InsertCommentTask(commentTask)
+
+	if flag {
+		utils.WrapAPIData(c, map[string]interface{}{
+			"ID Task": commentTask.ID_Task,
+		}, http.StatusOK, "success")
+		return
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func GetPortofolio(c *gin.Context) {
+
+	var portofolio []model.Portofolio
+	//var user model.User
+
+	parm := c.Param("username")
+
+	//model.DB.Where("username=? ", parm).Find(&user)
+
+	//user.Email = portofolio
+
+	model.DB.Where("username=? ", parm).Find(&portofolio)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": portofolio,
+	}, http.StatusOK, "success")
+}
+
+func InsertPortofolio(c *gin.Context) {
+
+	var portofolio model.Portofolio
+
+	if err := c.Bind(&portofolio); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	parm := c.Param("username")
+
+	portofolio.Username = parm
+
+	model.DB.Create(&portofolio)
+	var i int
+
+	i = 1
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":         portofolio,
+		"Nilai_tombol": i,
+	}, http.StatusOK, "success")
+}
+
+func UpdatePortofolio(c *gin.Context) {
+
+	var portofolio model.Portofolio
+	var user model.User
+
+	if err := c.Bind(&portofolio); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//uID := c.Param("email")
+
+	parm := c.Param("username")
+
+	//portofolio.Username = parm
+
+	model.DB.Where("username=? ", parm).Find(&user)
+
+	fmt.Println(user.Email)
+
+	portofolio.Username = user.Username
+	portofolio.Email = user.Email
+	portofolio.Phone = user.Phone
+
+	model.DB.Save(&portofolio)
+
+	var i int
+
+	i = 0
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data":         portofolio,
+		"Nilai_tombol": i,
 	}, http.StatusOK, "success")
 }

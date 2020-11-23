@@ -158,21 +158,6 @@ func AuthHandler(c *gin.Context) {
 	accountT.Password = pass
 	accountR.Password = pass
 
-	claims := &Claims{
-		Username:       u.Name,
-		Password:       account.Password,
-		StandardClaims: jwt.StandardClaims{},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	// Create the JWT string
-
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"eror": err})
-		return
-	}
-
 	e := model.DB.Where("email=?", u.Email).First(&account)
 	if e.RowsAffected == 1 {
 		utils.WrapAPIError(c, "Email Sudah Ada", http.StatusOK) //c.JSON(http.StatusOK, gin.H{"status check email": "ok"})
@@ -193,23 +178,51 @@ func AuthHandler(c *gin.Context) {
 
 	model.DB.Where("email= ?", u.Email).Delete(&accountR)
 
-	fmt.Println(tokenString)
-	fmt.Println(token)
-	//
+	var auth model.Auth
 
-	//c.Header("Content-Type", "application/json")
+	pass = ""
 
-	//c.Request.Write("Authorization:", tokenString)
-	c.Header("Authorization", tokenString)
-	//c.Request.Response.se
-	//c.Writer.Header().Set("Authorization:", tokenString)
+	auth.Username = u.Name
+	auth.Password = pass
 
-	//c.JSON(http.StatusOK, gin.H{"token JWT Generate": tokenString})
-	//c.JSON(http.StatusOK, gin.H{"token google": datatoken, "token JWT Generate": tokenString})
-	//c.Redirect(http.StatusTemporaryRedirect, "http://localhost:8084/api/pref/"+u.Name)
+	fmt.Println(u.Name)
+	fmt.Println(account.Password)
 
-	c.Redirect(http.StatusPermanentRedirect, "http://localhost:8084/api/pref/farhani")
+	flag, err, token := model.Login(auth)
+	if flag {
+		c.Header("Authorization", token)
+		//c.Writer.Header().Set("Authorization:", token)
+		c.Writer.Header().Set("Content-Type", "application/json")
+		c.Writer.Header().Set("Authorization", token)
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Set("Authorization", token)
+		c.Copy().Set("Authorization", token)
+
+		c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/PrefCategory")
+		c.Next()
+
+	} else {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+	}
+
 }
+
+//fmt.Println(tokenString)
+
+//
+
+//c.Header("Content-Type", "application/json")
+
+//c.Request.Write("Authorization:", tokenString)
+
+//c.Request.Response.se
+//c.Writer.Header().Set("Authorization:", tokenString)
+
+//c.JSON(http.StatusOK, gin.H{"token JWT Generate": tokenString})
+//c.JSON(http.StatusOK, gin.H{"token google": datatoken, "token JWT Generate": tokenString})
+//c.Redirect(http.StatusTemporaryRedirect, "http://localhost:8084/api/pref/"+u.Name)
+
+//	c.Redirect(http.StatusPermanentRedirect, "http://localhost:8084/api/pref/farhani")
 
 func LoginHandler(ctx *gin.Context) {
 	state, err := RandToken(32)
