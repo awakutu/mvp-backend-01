@@ -157,8 +157,8 @@ func main() {
 	router.POST("/api/portofolio/updateExp/:username", middleware.Auth, controller.UpdateExprience)
 	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.UpdateExpertise)
 
-	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.DeleteExprience)
-	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.DeleteExpertise)
+	router.POST("/api/portofolio/deleteExp/:username", middleware.Auth, controller.DeleteExprience)
+	router.POST("/api/portofolio/deleteExt/:username", middleware.Auth, controller.DeleteExpertise)
 
 	//---------------------------------------------------------------------
 	router.Run(":8084") //port server utama
