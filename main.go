@@ -148,9 +148,12 @@ func main() {
 	//portofolio
 	//---------------------------------------------------------------------
 	router.GET("/api/portofolio/:username", middleware.Auth, controller.GetPortofolio)
-	router.POST("/api/portofolio/insert/:username", middleware.Auth, controller.InsertPortofolio)
-	router.POST("/api/portofolio/update/:username", middleware.Auth, controller.UpdatePortofolio)
 
+	//router.POST("/api/portofolio/update/:username", middleware.Auth, controller.UpdatePortofolio
+
+	router.POST("/api/portofolio/insertExp/:username", middleware.Auth, controller.InsertExprience)
+
+	router.POST("/api/portofolio/insertExt/:username", middleware.Auth, controller.InsertExpertise)
 	//---------------------------------------------------------------------
 
 	router.Run(":8084") //port server utama

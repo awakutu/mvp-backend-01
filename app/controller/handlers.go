@@ -190,8 +190,9 @@ func AuthHandler(c *gin.Context) {
 
 	flag, err, token := model.Login(auth)
 	if flag {
+		session.Set("token", token)
+		session.Save()
 		c.Header("Authorization", token)
-		//c.Writer.Header().Set("Authorization:", token)
 		c.Writer.Header().Set("Content-Type", "application/json")
 		c.Writer.Header().Set("Authorization", token)
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

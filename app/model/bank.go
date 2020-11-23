@@ -199,28 +199,25 @@ type ProgressStat struct {
 //SQL QUery kira2 : SELECT Users.username, Users.Email, Username.Phone, Username.TTL
 
 type Portofolio struct {
-	ID                int    `gorm:"primary_key"; json:"ID"`
-	Username          string `json:"username"`
-	Email             string `json:"email"`
-	Phone             string `json:"phone"`
-	ValueExprience    string `json:"exprience"`
-	ValueExpertise    string `json:"expertise"`
-	Tahun_Exprience   string `json:"tahun_Exprience"`
-	Jabatan_Expertise string `json:"jabatan_Expertise"`
+	ID        int         `gorm:"primary_key"; json:"ID"`
+	Username  string      `json:"username"`
+	Exprience []Exprience `gorm:"ForeignKey:IDportofolio;association_foreignKey:id";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"exprience"`
+	Expertise []Expertise `gorm:"ForeignKey:IDportofolio2;association_foreignKey:id2";constraint:OnUpdate:CASCADE,OnDelete:SET NULL; json:"expertise"`
 }
-
 type Exprience struct {
-	ID           int    `gorm:"primary_key"; json:"ID"`
-	IDportofolio int    `json:"idportofolio"`
-	Username     string `json:"username"`
-	Value        string `json:"value"`
+	ID              int    `gorm:"primary_key"; json:"ID"`
+	IDportofolio    int    `json:"idportofolio"`
+	Username        string `json:"username"`
+	ValueExprience  string `json:"exprience"`
+	Tahun_Exprience string `json:"tahun_Exprience"`
 }
 
 type Expertise struct {
-	ID           int    `gorm:"primary_key"; json:"ID"`
-	IDportofolio int    `json:"idportofolio"`
-	Username     string `json:"username"`
-	Value        string `json:"value"`
+	ID                int    `gorm:"primary_key"; json:"ID"`
+	IDportofolio2     int    `json:"idportofolio"`
+	Username          string `json:"username"`
+	ValueExpertise    string `json:"expertise"`
+	Jabatan_Expertise string `json:"jabatan_Expertise"`
 }
 
 func checkMail(user User) (bool, error) {

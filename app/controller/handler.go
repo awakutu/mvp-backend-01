@@ -1277,80 +1277,87 @@ func CommentTask(c *gin.Context) {
 	}
 }
 
+type CheckPortofolios struct {
+	Username string `json:"username"`
+}
+
 func GetPortofolio(c *gin.Context) {
 
-	var portofolio []model.Portofolio
-	//var user model.User
-
-	parm := c.Param("username")
-
-	//model.DB.Where("username=? ", parm).Find(&user)
-
-	//user.Email = portofolio
-
-	model.DB.Where("username=? ", parm).Find(&portofolio)
-
-	utils.WrapAPIData(c, map[string]interface{}{
-		"Data": portofolio,
-	}, http.StatusOK, "success")
-}
-
-func InsertPortofolio(c *gin.Context) {
-
 	var portofolio model.Portofolio
-
-	if err := c.Bind(&portofolio); err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	parm := c.Param("username")
-
-	portofolio.Username = parm
-
-	model.DB.Create(&portofolio)
-	var i int
-
-	i = 1
-
-	utils.WrapAPIData(c, map[string]interface{}{
-		"Data":         portofolio,
-		"Nilai_tombol": i,
-	}, http.StatusOK, "success")
-}
-
-func UpdatePortofolio(c *gin.Context) {
-
-	var portofolio model.Portofolio
+	//var exprience model.Exprience
+	//var expertise model.Expertise
 	var user model.User
 
-	if err := c.Bind(&portofolio); err != nil {
-		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	//uID := c.Param("email")
-
 	parm := c.Param("username")
-
-	//portofolio.Username = parm
 
 	model.DB.Where("username=? ", parm).Find(&user)
 
-	fmt.Println(user.Email)
-
 	portofolio.Username = user.Username
-	portofolio.Email = user.Email
-	portofolio.Phone = user.Phone
 
-	model.DB.Save(&portofolio)
+	//var check CheckPortofolios
+	//por
+	q := model.DB.Where("username=? ", parm).Find(&portofolio)
+	b := q.RowsAffected
 
-	var i int
+	fmt.Println(portofolio.ID)
 
-	i = 0
+	if b == 1 {
+		model.DB.Create(&portofolio)
+	}
+
+	model.DB.Preload(clause.Associations).Where("username=?", parm).Find(&portofolio)
+	//model.DB.Where("username=?", parm)
+
+	//model.DB.Where()
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Portofolio": portofolio,
+	}, http.StatusOK, "success")
+}
+
+func InsertExprience(c *gin.Context) {
+
+	var exprience model.Exprience
+
+	if err := c.Bind(&exprience); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	parm := c.Param("username")
+
+	exprience.Username = parm
+
+	model.DB.Create(&exprience)
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		"Data":         portofolio,
-		"Nilai_tombol": i,
+		"Data": exprience,
+		//"Nilai_tombol": i,
+	}, http.StatusOK, "success")
+}
+
+func InsertExpertise(c *gin.Context) {
+
+	//var portofolio model.Portofolio
+	var user model.User
+	var expertise model.Expertise
+
+	if err := c.Bind(&expertise); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	parm := c.Param("username")
+
+	model.DB.Where("username=? ", parm).Find(&user)
+
+	//fmt.Println(user.Email)
+
+	expertise.Username = user.Username
+
+	model.DB.Create(&expertise)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": expertise,
+		//"Nilai_tombol": i,
 	}, http.StatusOK, "success")
 }
