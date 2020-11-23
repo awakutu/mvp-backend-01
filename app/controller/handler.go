@@ -1301,7 +1301,7 @@ func GetPortofolio(c *gin.Context) {
 
 	fmt.Println(portofolio.ID)
 
-	if b == 1 {
+	if b == 0 {
 		model.DB.Create(&portofolio)
 	}
 
@@ -1359,5 +1359,77 @@ func InsertExpertise(c *gin.Context) {
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": expertise,
 		//"Nilai_tombol": i,
+	}, http.StatusOK, "success")
+}
+
+func DeleteExprience(c *gin.Context) {
+
+	var exprience model.Exprience
+
+	parm := c.Param("id")
+
+	exprience.Username = parm
+
+	model.DB.Where("id = ?", exprience.ID).Delete(&exprience)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": exprience,
+	}, http.StatusOK, "success")
+}
+
+func DeleteExpertise(c *gin.Context) {
+
+	var expertise model.Expertise
+
+	parm := c.Param("id")
+
+	expertise.Username = parm
+
+	//model.DB.Where("username=? ", parm).Find(&user)
+
+	model.DB.Where("id = ?", expertise.ID).Delete(&expertise)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": expertise,
+	}, http.StatusOK, "success")
+}
+
+func UpdateExprience(c *gin.Context) {
+
+	var exprience model.Exprience
+
+	if err := c.Bind(&exprience); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	parm := c.Param("id")
+
+	exprience.Username = parm
+
+	model.DB.Where("id = ?", exprience.ID).Save(&exprience)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": exprience,
+	}, http.StatusOK, "success")
+}
+
+func UpdateExpertise(c *gin.Context) {
+
+	var expertise model.Expertise
+
+	if err := c.Bind(&expertise); err != nil {
+		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	parm := c.Param("id")
+
+	expertise.Username = parm
+
+	model.DB.Where("id = ?", expertise.ID).Save(&expertise)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": expertise,
 	}, http.StatusOK, "success")
 }

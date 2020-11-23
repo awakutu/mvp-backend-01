@@ -140,9 +140,9 @@ func main() {
 	//gogle
 	//---------------------------------------------------------------------
 	//router.GET("/auth/google/callback", controller.AuthHandler) //redirect
-	router.GET("/google", controller.LoginHandler)
+	router.GET("/google", middleware.Auth, controller.LoginHandler)
 	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
-	router.GET("/auth", controller.AuthHandler)
+	router.GET("/auth", middleware.Auth, controller.AuthHandler)
 	//router.GET("/google", controller.LoginHandler) //localhost
 
 	//portofolio
@@ -152,9 +152,14 @@ func main() {
 	//router.POST("/api/portofolio/update/:username", middleware.Auth, controller.UpdatePortofolio
 
 	router.POST("/api/portofolio/insertExp/:username", middleware.Auth, controller.InsertExprience)
-
 	router.POST("/api/portofolio/insertExt/:username", middleware.Auth, controller.InsertExpertise)
-	//---------------------------------------------------------------------
 
+	router.POST("/api/portofolio/updateExp/:username", middleware.Auth, controller.UpdateExprience)
+	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.UpdateExpertise)
+
+	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.DeleteExprience)
+	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.DeleteExpertise)
+
+	//---------------------------------------------------------------------
 	router.Run(":8084") //port server utama
 }
