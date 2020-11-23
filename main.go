@@ -103,7 +103,7 @@ func main() {
 	router.POST("/api/project", middleware.Auth, controller.InsertProject)             //create project
 	router.GET("/api/project", middleware.Auth, controller.GetListProjAll)             //dapatkan semua project
 	router.GET("/api/project/list/:username", middleware.Auth, controller.GetListProj) //Apinya salah soon updated
-	router.POST("/api/project/edit/:id", middleware.Auth, controller.UpdateProj)       //edit suatu projek tertentu (id = id_projek)
+	router.POST("/api/project/update", middleware.Auth, controller.UpdateProj)         //edit suatu projek tertentu (id = id_projek)
 	router.POST("/api/project/delete", middleware.Auth, controller.DeleteProj)         //delete suatu projek , akan di update besok routnya
 	router.GET("/api/project/detail/:id", middleware.Auth, controller.GetProj)         // dapatkan detail projek dg id project tertentu
 
@@ -111,12 +111,11 @@ func main() {
 	router.GET("/api/project/groupanggota/:id", middleware.Auth, controller.GetListAnggota)  //Dapatkan list semua anggota dari satu proyek (id=idprojek)
 	router.POST("/api/project/groupdelete", middleware.Auth, controller.DeleteAnggota)       //delete salah satu anggota di suatu proyek (edit soon)
 
-	router.POST("/api/project/task", middleware.Auth, controller.InsertTask)            //buat task
-	router.GET("/api/project/task/:id", middleware.Auth, controller.GetTask)            //dapatkan semua task dari satu projek id = id_project
-	router.POST("/api/project/task/:id/edit", middleware.Auth, controller.UpdateTask)   //edit task  id = id_task
-	router.POST("/api/project/task/:id/delete", middleware.Auth, controller.DeleteTask) //delete id = id_task
-	//soon update status task
-	//soon lihat by status
+	router.POST("/api/project/task", middleware.Auth, controller.InsertTask)             //buat task
+	router.GET("/api/project/task/:id", middleware.Auth, controller.GetTask)             //dapatkan semua task dari satu projek id = id_project
+	router.POST("/api/project/task/:id/edit", middleware.Auth, controller.UpdateTask)    //edit task  id = id_task
+	router.POST("/api/project/task/:id/delete", middleware.Auth, controller.DeleteTask)  //delete id = id_task
+	router.GET("/api/project/detailtask/:id", middleware.Auth, controller.GetDetailTask) //id = id_task
 
 	//comment di task
 	router.POST("/api/task/:id", middleware.Auth, controller.CommentTask)

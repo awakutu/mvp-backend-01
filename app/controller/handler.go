@@ -1089,22 +1089,13 @@ func UpdateProj(c *gin.Context) {
 		return
 	}
 
-	sk := c.Param("id")
-
-	var sk1 model.Project
-	model.DB.Where("id=?", sk).Find(&sk1)
-
-	fmt.Println(sk1.ID)
-
 	now := time.Now()
 	uproj.Tgl_edit = &now
 
-	result := model.DB.Model(model.Project{}).Where("id = ?", sk1.ID).Updates(uproj)
-	b := result.RowsAffected
+	model.DB.Model(model.Project{}).Where("id = ?", uproj.ID).UpdateColumns(uproj)
 
 	utils.WrapAPIData(c, map[string]interface{}{
-		"Data":        &uproj,
-		"Rows_update": b,
+		"Data": &uproj,
 	}, http.StatusOK, "success")
 }
 
@@ -1275,6 +1266,22 @@ func CommentTask(c *gin.Context) {
 		utils.WrapAPIError(c, err.Error(), http.StatusBadRequest)
 		return
 	}
+}
+
+func GetDetailTask(c *gin.Context) {
+	//var ka []model.Kategori
+	var dt []model.Task
+	var dt1 model.Task
+
+	dtID := c.Param("id")
+
+	model.DB.Model(&dt1).Where("id=?", dtID).Scan(&dt)
+
+	fmt.Println(&dtID, dt1.ID)
+
+	utils.WrapAPIData(c, map[string]interface{}{
+		"Data": dt,
+	}, http.StatusOK, "success")
 }
 
 type CheckPortofolios struct {

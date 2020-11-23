@@ -155,6 +155,7 @@ type Project struct {
 	Username    string        `json:"username"`
 	SumAnggota  int           `json:"sum_anggota"`
 	GrupProject []GrupProject `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"projectname"`
+	Task        []Task        `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"task"`
 }
 
 type GrupProject struct {
