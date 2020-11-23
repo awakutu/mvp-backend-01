@@ -149,16 +149,14 @@ func main() {
 	//---------------------------------------------------------------------
 	router.GET("/api/portofolio/:username", middleware.Auth, controller.GetPortofolio)
 
-	//router.POST("/api/portofolio/update/:username", middleware.Auth, controller.UpdatePortofolio
-
 	router.POST("/api/portofolio/insertExp/:username", middleware.Auth, controller.InsertExprience)
 	router.POST("/api/portofolio/insertExt/:username", middleware.Auth, controller.InsertExpertise)
 
-	router.POST("/api/portofolio/updateExp/:username", middleware.Auth, controller.UpdateExprience)
-	router.POST("/api/portofolio/updateExt/:username", middleware.Auth, controller.UpdateExpertise)
+	router.POST("/api/portofolio/updateExp/:id", middleware.Auth, controller.UpdateExprience)
+	router.POST("/api/portofolio/updateExt/:id", middleware.Auth, controller.UpdateExpertise)
 
-	router.POST("/api/portofolio/deleteExp/:username", middleware.Auth, controller.DeleteExprience)
-	router.POST("/api/portofolio/deleteExt/:username", middleware.Auth, controller.DeleteExpertise)
+	router.POST("/api/portofolio/deleteExp/:id", middleware.Auth, controller.DeleteExprience)
+	router.POST("/api/portofolio/deleteExt/:id", middleware.Auth, controller.DeleteExpertise)
 
 	//---------------------------------------------------------------------
 	router.Run(":8084") //port server utama

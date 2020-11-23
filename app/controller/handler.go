@@ -1366,9 +1366,16 @@ func DeleteExprience(c *gin.Context) {
 
 	var exprience model.Exprience
 
-	parm := c.Param("id")
+	var parm string
+	parm = c.Param("id")
 
-	exprience.Username = parm
+	parm2, err := strconv.Atoi(parm)
+
+	if err != nil {
+		fmt.Println("eror")
+	}
+
+	exprience.ID = parm2
 
 	model.DB.Where("id = ?", exprience.ID).Delete(&exprience)
 
@@ -1381,9 +1388,16 @@ func DeleteExpertise(c *gin.Context) {
 
 	var expertise model.Expertise
 
-	parm := c.Param("id")
+	var parm string
+	parm = c.Param("id")
 
-	expertise.Username = parm
+	parm2, err := strconv.Atoi(parm)
+
+	if err != nil {
+		fmt.Println("eror")
+	}
+
+	expertise.ID = parm2
 
 	//model.DB.Where("username=? ", parm).Find(&user)
 
@@ -1403,11 +1417,19 @@ func UpdateExprience(c *gin.Context) {
 		return
 	}
 
-	parm := c.Param("id")
+	var parm string
+	parm = c.Param("id")
 
-	exprience.Username = parm
+	parm2, err := strconv.Atoi(parm)
 
-	model.DB.Where("id = ?", exprience.ID).Save(&exprience)
+	exprience.ID = parm2
+
+	if err != nil {
+		fmt.Println("eror")
+	}
+
+	//model.DB.Where("id = ?", exprience.ID).Save(&exprience)
+	model.DB.Save(&exprience)
 
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": exprience,
@@ -1423,11 +1445,19 @@ func UpdateExpertise(c *gin.Context) {
 		return
 	}
 
-	parm := c.Param("id")
+	var parm string
+	parm = c.Param("id")
 
-	expertise.Username = parm
+	parm2, err := strconv.Atoi(parm)
 
-	model.DB.Where("id = ?", expertise.ID).Save(&expertise)
+	if err != nil {
+		fmt.Println("eror")
+	}
+
+	expertise.ID = parm2
+
+	//model.DB.Where("id = ?", expertise.ID).Updates(model.Expertise{"exp": ""})
+	model.DB.Save(&expertise)
 
 	utils.WrapAPIData(c, map[string]interface{}{
 		"Data": expertise,
