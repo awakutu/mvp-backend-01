@@ -372,11 +372,6 @@ func AccepAdmin(c *gin.Context) {
 		return
 	}
 
-	//fmt.Println(account)
-
-	//q := model.DB.Save(&account)
-
-	//approve akun
 	q := model.DB.Delete(&accountemp)
 	row := q.RowsAffected
 

@@ -139,11 +139,11 @@ func main() {
 
 	//gogle
 	//---------------------------------------------------------------------
-	//router.GET("/auth/google/callback", controller.AuthHandler) //redirect
+	router.GET("/auth/google/callback", controller.AuthHandler) //redirect
 	//router.GET("/google", controller.LoginHandler)
-	router.GET("/auth/google/callback", controller.LoginHandler) //aws
-	router.GET("/auth", controller.AuthHandler)
-	//router.GET("/google", controller.LoginHandler) //localhost
+	//router.GET("/auth/google/callback", controller.LoginHandler) //aws
+	//router.GET("/auth", controller.AuthHandler)
+	router.GET("/google", controller.LoginHandler) //localhost
 
 	//portofolio
 	//---------------------------------------------------------------------

@@ -9,6 +9,7 @@ var DB *gorm.DB
 
 const (
 	MysqlDsn = `user:YbcuGH4Ks@z6$@tcp(3.15.137.94)/bank?parseTime=True&charset=utf8`
+	//MysqlDsn = `user:YbcuGH4Ks@z6$@tcp(127.0.0.1)/cocreate?parseTime=True&charset=utf8` //localhost
 	//MysqlDsn = `root:YbcuGH4Ks@z6$@tcp(localhost:3306)/bank?parseTime=True&charset=utf8`
 )
 
