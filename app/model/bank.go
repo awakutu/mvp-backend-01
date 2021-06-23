@@ -155,6 +155,7 @@ type Project struct {
 	Username    string        `json:"username"`
 	SumAnggota  int           `json:"sum_anggota"`
 	GrupProject []GrupProject `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"projectname"`
+	Task        []Task        `gorm:"Foreignkey:IDP;association_foreignkey:id;" json:"task"`
 }
 
 type GrupProject struct {
@@ -234,6 +235,14 @@ func checkUsername(user User) (bool, error) {
 	err := DB.Where(&User{Email: user.Email}).First(&user)
 	if err.RowsAffected == 1 {
 		return false, errors.Errorf("Account sudah terdaftar")
+	}
+	return true, nil
+}
+
+func checkAnggota(angg GrupProject) (bool, error) {
+	err := DB.Where(&GrupProject{ID: angg.ID}).First(&angg)
+	if err.RowsAffected == 1 {
+		return false, errors.Errorf("Anda Tidak terdaftar sebagai anggota")
 	}
 	return true, nil
 }
